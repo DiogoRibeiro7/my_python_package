@@ -32,11 +32,11 @@ my_python_package/
 name = "my_python_package"
 version = "0.1.0"
 description = "A short description of the package."
-authors = ["Your Name <you@example.com>"]
+authors = ["Diogo Ribeiro <dfr@esmad.ipp.pt>"]
 license = "MIT"
 readme = "README.md"
 packages = [{ include = "my_python_package", from = "src" }]
-repository = "https://github.com/yourusername/my_python_package"
+repository = "https://github.com/DiogoRibeiro7/my_python_package"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
@@ -117,7 +117,7 @@ build/
 ```
 MIT License
 
-Copyright (c) 2025 Your Name
+Copyright (c) 2025 Diogo Ribeiro
 
 Permission is hereby granted, free of charge...
 ```
