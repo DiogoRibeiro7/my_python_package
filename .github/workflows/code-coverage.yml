@@ -7,6 +7,10 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+# Add permissions block here
+permissions:
+  contents: write  # Needed to update the README.md file
+  
 jobs:
   coverage:
     runs-on: ubuntu-latest
