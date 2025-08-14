@@ -21,6 +21,9 @@ def hello(name: str, greeting: Optional[str] = None) -> str:
     Returns:
         A formatted greeting message
 
+    Raises:
+        TypeError: If name is not a string
+
     Examples:
         >>> hello("World")
         'Hello, World!'
@@ -28,6 +31,12 @@ def hello(name: str, greeting: Optional[str] = None) -> str:
         >>> hello("Python", greeting="Hi")
         'Hi, Python!'
     """
+    # Add type checking
+    if not isinstance(name, str):
+        raise TypeError("Name must be a string")
+    if greeting is not None and not isinstance(greeting, str):
+        raise TypeError("Greeting must be a string")
+    
     greeting = greeting or config.default_greeting
     return f"{greeting}, {name}!"
 
@@ -192,13 +201,19 @@ def format_greeting(
     greeting = greeting or config.default_greeting
     punctuation = punctuation or config.default_punctuation
 
+    # Build the full greeting first
     result = f"{greeting}, {name}{punctuation}"
 
+    # Apply uppercase if needed
     if uppercase:
         result = result.upper()
 
+    # Apply truncation if needed - fix the logic here
     if max_length and len(result) > max_length:
-        result = result[: max_length - 3] + "..."
+        if max_length <= 3:
+            result = "..."
+        else:
+            result = result[:max_length - 3] + "..."
 
     return result
 

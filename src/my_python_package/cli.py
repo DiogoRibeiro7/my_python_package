@@ -71,10 +71,10 @@ def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
     )
     format_parser.add_argument("name", help="Name to greet")
     format_parser.add_argument(
-        "--greeting", default=None, help="Custom greeting"
+        "--greeting", default="Hello", help="Custom greeting"
     )
     format_parser.add_argument(
-        "--punctuation", default=None, help="Ending punctuation"
+        "--punctuation", default="!", help="Ending punctuation"
     )
     format_parser.add_argument(
         "--uppercase", action="store_true", help="Convert to uppercase"
@@ -91,7 +91,7 @@ def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
         "names", nargs="+", help="Names to greet"
     )
     multi_parser.add_argument(
-        "--greeting", default=None, help="Custom greeting"
+        "--greeting", default="Hello", help="Custom greeting"
     )
     
     # Config commands
@@ -177,6 +177,10 @@ def main(args: Optional[List[str]] = None) -> int:
     
     # Basic greeting commands
     if parsed_args.command == "hello":
+        # Add type checking
+        if not isinstance(parsed_args.name, str):
+            raise TypeError("Name must be a string")
+        
         logger.debug(f"Running hello command for name: {parsed_args.name}")
         result = hello(parsed_args.name, greeting=parsed_args.greeting)
         print(result)
