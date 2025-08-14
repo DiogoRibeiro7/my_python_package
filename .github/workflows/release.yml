@@ -1,0 +1,218 @@
+name: Release to PyPI
+
+on:
+  push:
+    tags:
+      - 'v*'  # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # For creating GitHub release
+      id-token: write  # For PyPI trusted publishing
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper changelog generation
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Configure Poetry
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
+      
+      - name: Install dependencies
+        run: |
+          poetry install
+      
+      - name: Run tests
+        run: |
+          poetry run pytest
+      
+      - name: Build package
+        run: |
+          poetry build
+      
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+      
+      - name: Check if version matches pyproject.toml
+        run: |
+          PYPROJECT_VERSION=$(poetry version -s)
+          TAG_VERSION=${{ steps.extract_version.outputs.version }}
+          if [[ "$PYPROJECT_VERSION" != "$TAG_VERSION" ]]; then
+            echo "Error: Tag version v$TAG_VERSION does not match pyproject.toml version $PYPROJECT_VERSION"
+            exit 1
+          fi
+      
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          # Get the previous tag if any
+          PREV_TAG=$(git describe --tags --abbrev=0 ${{ github.ref_name }}^ 2>/dev/null || echo "")
+          
+          if [[ -z "$PREV_TAG" ]]; then
+            # If no previous tag, use the full history
+            echo "### Changes in version ${{ steps.extract_version.outputs.version }}" > release_notes.md
+            echo "" >> release_notes.md
+            echo "Initial release" >> release_notes.md
+          else
+            # Generate changelog between tags
+            echo "### Changes since $PREV_TAG" > release_notes.md
+            echo "" >> release_notes.md
+            git log --pretty=format:"* %s (%an)" $PREV_TAG..${{ github.ref_name }} >> release_notes.md
+          fi
+          
+          # Format and organize the changelog better
+          python -c '
+          import re
+          
+          with open("release_notes.md", "r") as f:
+              notes = f.read()
+          
+          # Group by change type
+          changes = {"feat": [], "fix": [], "docs": [], "test": [], "ci": [], "refactor": [], "style": [], "chore": [], "other": []}
+          
+          for line in notes.split("\n"):
+              if not line.startswith("*"):
+                  continue
+                  
+              match = re.match(r"\* (\w+)(\([\w\-\.]+\))?:", line)
+              if match:
+                  change_type = match.group(1)
+                  if change_type in changes:
+                      changes[change_type].append(line)
+                  else:
+                      changes["other"].append(line)
+              else:
+                  changes["other"].append(line)
+          
+          # Create formatted notes
+          formatted = []
+          header_lines = []
+          
+          for line in notes.split("\n"):
+              if not line.startswith("*"):
+                  header_lines.append(line)
+          
+          formatted.extend(header_lines)
+          
+          # Features
+          if changes["feat"]:
+              formatted.append("\n#### 🚀 Features\n")
+              formatted.extend(changes["feat"])
+          
+          # Fixes
+          if changes["fix"]:
+              formatted.append("\n#### 🐛 Bug Fixes\n")
+              formatted.extend(changes["fix"])
+          
+          # Documentation
+          if changes["docs"]:
+              formatted.append("\n#### 📝 Documentation\n")
+              formatted.extend(changes["docs"])
+          
+          # Tests
+          if changes["test"]:
+              formatted.append("\n#### 🧪 Tests\n")
+              formatted.extend(changes["test"])
+          
+          # CI
+          if changes["ci"]:
+              formatted.append("\n#### 🔄 CI/CD\n")
+              formatted.extend(changes["ci"])
+          
+          # Refactoring
+          if changes["refactor"]:
+              formatted.append("\n#### ♻️ Refactoring\n")
+              formatted.extend(changes["refactor"])
+          
+          # Style
+          if changes["style"]:
+              formatted.append("\n#### 🎨 Style\n")
+              formatted.extend(changes["style"])
+          
+          # Other changes
+          other_changes = changes["other"] + changes["chore"]
+          if other_changes:
+              formatted.append("\n#### 🔧 Other Changes\n")
+              formatted.extend(other_changes)
+          
+          with open("release_notes.md", "w") as f:
+              f.write("\n".join(formatted))
+          '
+          
+          # Save release notes to output
+          RELEASE_NOTES=$(cat release_notes.md)
+          # Escape newlines for GitHub Actions output
+          RELEASE_NOTES="${RELEASE_NOTES//'%'/'%25'}"
+          RELEASE_NOTES="${RELEASE_NOTES//$'\n'/'%0A'}"
+          RELEASE_NOTES="${RELEASE_NOTES//$'\r'/'%0D'}"
+          echo "notes=$RELEASE_NOTES" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release_notes.md
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+          draft: false
+          prerelease: ${{ contains(steps.extract_version.outputs.version, 'rc') || contains(steps.extract_version.outputs.version, 'alpha') || contains(steps.extract_version.outputs.version, 'beta') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Publish to TestPyPI first
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+          verbose: true
+      
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
+          
+      - name: Update CHANGELOG.md
+        run: |
+          # Only update if on main branch
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            # Get current date
+            DATE=$(date +%Y-%m-%d)
+            
+            # Update CHANGELOG.md
+            if grep -q "\[Unreleased\]" CHANGELOG.md; then
+              # Update the Unreleased section to the new version
+              sed -i "s/\[Unreleased\]/\[${{ steps.extract_version.outputs.version }}\] - $DATE/" CHANGELOG.md
+              
+              # Add a new Unreleased section at the top
+              sed -i "0,/^## \[${{ steps.extract_version.outputs.version }}\]/s//## \[Unreleased\]\n\n### Added\n\n### Changed\n\n### Fixed\n\n## \[${{ steps.extract_version.outputs.version }}\]/" CHANGELOG.md
+              
+              # Update the links at the bottom
+              if grep -q "\[unreleased\]:" CHANGELOG.md; then
+                sed -i "s|\[unreleased\]:.*|[unreleased]: https://github.com/DiogoRibeiro7/my_python_package/compare/v${{ steps.extract_version.outputs.version }}...HEAD|" CHANGELOG.md
+                sed -i "/\[unreleased\]:/a [{{ steps.extract_version.outputs.version }}]: https://github.com/DiogoRibeiro7/my_python_package/compare/v$(git describe --tags --abbrev=0 ${{ github.ref_name }}^)...v${{ steps.extract_version.outputs.version }}" CHANGELOG.md
+              fi
+            fi
+          fi
+      
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Package v${{ steps.extract_version.outputs.version }} has been released to PyPI!"
+          echo "📦 https://pypi.org/project/my-python-package/${{ steps.extract_version.outputs.version }}/"
