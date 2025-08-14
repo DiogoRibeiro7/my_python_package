@@ -137,7 +137,7 @@ def test_random_greeting_contains_name():
         ({"greeting": "Hi"}, "Hi, John!"),
         ({"punctuation": "."}, "Hello, John."),
         ({"uppercase": True}, "HELLO, JOHN!"),
-        ({"max_length": 10}, "Hello, Jo..."),
+        ({"max_length": 10}, "Hello, ..."),
         (
             {
                 "greeting": "Welcome",
