@@ -107,7 +107,9 @@ class Config:
     @max_name_length.setter
     def max_name_length(self, value: int) -> None:
         """Set maximum name length."""
-        if not isinstance(value, int) or value <= 0:
+        if not isinstance(value, int):
+            raise TypeError("Max name length must be an integer")
+        if value <= 0:
             raise ValueError("Max name length must be a positive integer")
         self._config["max_name_length"] = value
     

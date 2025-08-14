@@ -208,12 +208,19 @@ def format_greeting(
     if uppercase:
         result = result.upper()
 
-    # Apply truncation if needed - fix the logic here
-    if max_length and len(result) > max_length:
+    # Apply truncation if needed - ensure we include part of the name
+    if max_length is not None and len(result) > max_length:
         if max_length <= 3:
             result = "..."
         else:
-            result = result[:max_length - 3] + "..."
+            # Make sure we get some of the name in there
+            # Format: "greeting, na..."
+            greeting_part = f"{greeting}, "
+            available_for_name = max_length - len(greeting_part) - 3  # 3 for "..."
+            if available_for_name > 0:
+                result = greeting_part + name[:available_for_name] + "..."
+            else:
+                result = result[:max_length - 3] + "..."
 
     return result
 
