@@ -265,4 +265,3 @@ def get_config() -> dict[str, Any]:
         Configuration dictionary
     """
     return config.as_dict()
-
