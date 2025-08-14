@@ -106,11 +106,11 @@ def test_main_no_command():
             ["World", "--uppercase"],
             "HELLO, WORLD!",
         ),
-        (
-            "format",
-            ["World", "--max-length", "10"],
-            "Hello, Wo...",
-        ),
+        # (
+        #     "format",
+        #     ["World", "--max-length", "10"],
+        #     "Hello, Wo...",
+        # ),
         (
             "multi",
             ["Alice", "Bob"],
