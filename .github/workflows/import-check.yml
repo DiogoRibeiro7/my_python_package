@@ -1,0 +1,30 @@
+name: Import check
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+    paths:
+      - "**/*.py"
+      - "pyproject.toml"
+      - "scripts/check_imports_vs_pyproject.py"
+  pull_request:
+    paths:
+      - "**/*.py"
+      - "pyproject.toml"
+      - "scripts/check_imports_vs_pyproject.py"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install tomlkit packaging
+      - name: Check imports vs pyproject
+        run: |
+          python scripts/check_imports_vs_pyproject.py --fail-on missing --format text

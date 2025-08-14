@@ -1,0 +1,60 @@
+name: Dependency Scanning
+
+on:
+  schedule:
+    - cron: '0 9 * * 5'  # Run at 9:00 UTC every Friday
+  push:
+    paths:
+      - 'pyproject.toml'
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          
+      - name: Install poetry export plugin
+        run: |
+          poetry self add poetry-plugin-export
+          
+      - name: Install dependencies and export requirements
+        run: |
+          poetry install
+          poetry export -f requirements.txt --without-hashes -o requirements.txt
+          
+      - name: Run safety check
+        run: |
+          pip install safety
+          safety check -r requirements.txt --full-report || true
+          
+      - name: Check for outdated dependencies
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt || true  # Don't fail workflow on findings
+          
+      - name: Cache results
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            .audit-results
+          key: ${{ runner.os }}-dependency-scan-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-dependency-scan-
