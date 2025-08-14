@@ -4,17 +4,40 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Optional, Union
+from typing import Literal, Optional, Union, overload
 
 # Default log format
-DEFAULT_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+DEFAULT_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 # Package logger
-logger = logging.getLogger("my_python_package")
+logger: logging.Logger = logging.getLogger("my_python_package")
+
+# Type alias for log levels
+LogLevel = Union[int, str, Literal["debug", "info", "warning", "error", "critical"]]
+
+
+@overload
+def configure_logging(
+    level: LogLevel = logging.INFO,
+    format_str: Optional[str] = None,
+    log_file: None = None,
+    propagate: bool = False,
+) -> None:
+    ...
+
+
+@overload
+def configure_logging(
+    level: LogLevel = logging.INFO,
+    format_str: Optional[str] = None,
+    log_file: Union[str, Path] = ...,
+    propagate: bool = False,
+) -> None:
+    ...
 
 
 def configure_logging(
-    level: Union[int, str] = logging.INFO,
+    level: LogLevel = logging.INFO,
     format_str: Optional[str] = None,
     log_file: Optional[Union[str, Path]] = None,
     propagate: bool = False,
@@ -24,9 +47,32 @@ def configure_logging(
     
     Args:
         level: Logging level (default: INFO)
+            Can be an integer level or string name like "debug", "info", etc.
         format_str: Log format string (default: DEFAULT_FORMAT)
+            Uses standard Python logging format strings
         log_file: Optional path to log file
+            If provided, logs will be written to this file in addition to console
         propagate: Whether to propagate to parent loggers
+            When True, logs will also be sent to parent loggers
+    
+    Examples:
+        >>> import tempfile
+        >>> with tempfile.NamedTemporaryFile() as temp:
+        ...     # Configure with INFO level and a log file
+        ...     configure_logging(level="info", log_file=temp.name)
+        ...     # Get the configured level (20 = INFO)
+        ...     logger.level == logging.INFO
+        True
+        
+        >>> # Configure with DEBUG level
+        >>> configure_logging(level=logging.DEBUG)
+        >>> logger.level == logging.DEBUG
+        True
+        
+        >>> # Configure with custom format
+        >>> configure_logging(format_str="%(levelname)s: %(message)s")
+        >>> len(logger.handlers) > 0  # Ensure handlers are configured
+        True
     """
     # Convert string level to int if needed
     if isinstance(level, str):
@@ -71,15 +117,32 @@ def get_logger(name: str) -> logging.Logger:
         
     Returns:
         Configured logger instance
+    
+    Examples:
+        >>> # Get a logger for a module
+        >>> module_logger = get_logger("core")
+        >>> module_logger.name
+        'my_python_package.core'
+        
+        >>> # Get a logger for a nested module
+        >>> nested_logger = get_logger("utils.helpers")
+        >>> nested_logger.name
+        'my_python_package.utils.helpers'
     """
     return logging.getLogger(f"my_python_package.{name}")
 
 
 # Configure from environment variables if present
 def _configure_from_env() -> None:
-    """Configure logging from environment variables."""
-    env_level = os.environ.get("MY_PYTHON_PACKAGE_LOG_LEVEL")
-    env_file = os.environ.get("MY_PYTHON_PACKAGE_LOG_FILE")
+    """
+    Configure logging from environment variables.
+    
+    Reads:
+        MY_PYTHON_PACKAGE_LOG_LEVEL: Logging level (debug, info, etc.)
+        MY_PYTHON_PACKAGE_LOG_FILE: Path to log file
+    """
+    env_level: Optional[str] = os.environ.get("MY_PYTHON_PACKAGE_LOG_LEVEL")
+    env_file: Optional[str] = os.environ.get("MY_PYTHON_PACKAGE_LOG_FILE")
     
     if env_level or env_file:
         configure_logging(
@@ -91,3 +154,4 @@ def _configure_from_env() -> None:
 # Default configuration
 configure_logging()
 _configure_from_env()
+
