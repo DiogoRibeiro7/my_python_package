@@ -204,23 +204,20 @@ def format_greeting(
     # Build the full greeting first
     result = f"{greeting}, {name}{punctuation}"
 
-    # Apply uppercase if needed
-    if uppercase:
-        result = result.upper()
-
-    # Apply truncation if needed - ensure we include part of the name
+    # Apply truncation BEFORE uppercase 
     if max_length is not None and len(result) > max_length:
         if max_length <= 3:
             result = "..."
         else:
-            # Make sure we get some of the name in there
-            # Format: "greeting, na..."
-            greeting_part = f"{greeting}, "
-            available_for_name = max_length - len(greeting_part) - 3  # 3 for "..."
-            if available_for_name > 0:
-                result = greeting_part + name[:available_for_name] + "..."
-            else:
-                result = result[:max_length - 3] + "..."
+            # Truncate to max_length-3, then add "..."
+            # For "Hello, John!" with max_length=10:
+            # Take "Hello, J" (8 chars) + "..." = "Hello, J..."
+            truncated_base = result[:max_length - 3]
+            result = truncated_base + "..."
+
+    # Apply uppercase after truncation
+    if uppercase:
+        result = result.upper()
 
     return result
 
