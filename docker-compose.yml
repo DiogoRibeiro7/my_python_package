@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/opt/pysetup
+    command: python -m my_python_package
+
+  test:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/opt/pysetup
+    command: pytest
+
+  lint:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/opt/pysetup
+    command: ruff check .
+
+  type-check:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/opt/pysetup
+    command: mypy src tests
+  
