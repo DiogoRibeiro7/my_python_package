@@ -58,6 +58,8 @@ make setup
 
 ### Basic Greeting
 
+### Basic Greeting
+
 ```python
 from my_python_package import hello
 
@@ -145,42 +147,26 @@ my-python-package format World --greeting "Welcome" --uppercase --max-length 15
 
 ## Development
 
-### Development Environment Setup
+### Setup
 
-Setting up your development environment is easy with the included tools:
+1. Clone the repository
 
-```bash
-# Full development setup (installs all dev dependencies and pre-commit hooks)
-make setup
+  ```bash
+  git clone https://github.com/DiogoRibeiro7/my_python_package.git
+  cd my_python_package
+  ```
 
-# Or install only dependencies without pre-commit hooks
-make dev-install
+2. Install dependencies
 
-# If you prefer not to use Poetry
-pip install -r dev-requirements.txt
-pre-commit install
-```
+  ```bash
+  poetry install
+  ```
 
-### Code Formatting and Quality Tools
+3. Setup pre-commit hooks
 
-The project uses multiple tools to ensure code quality:
-
-```bash
-# Format code (black, isort, ruff)
-make format
-
-# Lint code (ruff)
-make lint
-
-# Type check (mypy)
-make type-check
-
-# Security check (bandit)
-make security
-
-# Run all quality checks at once
-make lint type-check security
-```
+  ```bash
+  pre-commit install
+  ```
 
 ### Testing
 
@@ -306,6 +292,10 @@ my_python_package/
 │   ├── test_config.py        # Configuration tests
 │   ├── test_logging.py       # Logging tests
 │   └── test_cli.py           # CLI tests
+│   ├── test_core.py          # Core tests
+│   ├── test_config.py        # Configuration tests
+│   ├── test_logging.py       # Logging tests
+│   └── test_cli.py           # CLI tests
 ├── examples/                 # Usage examples
 │   └── usage.py              # Basic example
 ├── scripts/                  # Utility scripts
@@ -313,7 +303,11 @@ my_python_package/
 │   ├── pyproject_updater.py  # Dependency upgrade utility
 │   ├── check_imports_vs_pyproject.py  # Import checker
 │   └── generate_docs.py      # Documentation generator
+│   ├── check_imports_vs_pyproject.py  # Import checker
+│   └── generate_docs.py      # Documentation generator
 └── .github/                  # GitHub config
+    ├── ISSUE_TEMPLATE/       # Issue templates
+    ├── PULL_REQUEST_TEMPLATE.md # PR template
     ├── ISSUE_TEMPLATE/       # Issue templates
     ├── PULL_REQUEST_TEMPLATE.md # PR template
     └── workflows/            # CI/CD workflows
