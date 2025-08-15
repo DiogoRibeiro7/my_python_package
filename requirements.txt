@@ -1,0 +1,5 @@
+# Generated from pyproject.toml - Do not edit directly
+# To update, run:
+#     poetry export -f requirements.txt --without-hashes -o requirements.txt
+
+my_python_package>=0.3.0

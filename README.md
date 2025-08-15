@@ -5,7 +5,11 @@
 [![Tests](https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml/badge.svg)](https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml) 
 [![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://codecov.io/gh/DiogoRibeiro7/my_python_package)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/badge/ruff-enabled-brightgreen)](https://github.com/astral-sh/ruff)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat)](https://pycqa.github.io/isort/)
+[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 A minimal but production-ready Python package scaffold configured for publishing to [PyPI](https://pypi.org).
 
@@ -15,18 +19,39 @@ A minimal but production-ready Python package scaffold configured for publishing
 - 🔧 Configurable greeting functions with multiple formatting options
 - 🧪 Comprehensive testing suite with 100% coverage
 - 📊 Continuous Integration workflows for testing, coverage, and releases
-- 🛠️ Code quality tools preconfigured (ruff, mypy, pre-commit)
+- 🛠️ Code quality tools preconfigured (black, ruff, mypy, isort, pre-commit)
 - 📝 Complete documentation with doctests
 - 🔄 Automated dependency management and version bumping
+- 🔒 Security scanning with Bandit and Trivy
+- 🧩 Multi-environment testing with tox
 
 ## Installation
 
+### From PyPI
+
 ```bash
-# From PyPI
+# Using pip
 pip install my_python_package
 
-# Or with Poetry
+# Using Poetry
 poetry add my_python_package
+```
+
+### For Development
+
+```bash
+# Clone the repository
+git clone https://github.com/DiogoRibeiro7/my_python_package.git
+cd my_python_package
+
+# Using Poetry (recommended)
+poetry install
+
+# Set up pre-commit hooks
+pre-commit install
+
+# Alternatively, use the Makefile for one-step setup
+make setup
 ```
 
 ## Usage
@@ -120,23 +145,42 @@ my-python-package format World --greeting "Welcome" --uppercase --max-length 15
 
 ## Development
 
-### Setup
+### Development Environment Setup
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/DiogoRibeiro7/my_python_package.git
-   cd my_python_package
-   ```
+Setting up your development environment is easy with the included tools:
 
-2. Install dependencies with Poetry
-   ```bash
-   poetry install
-   ```
+```bash
+# Full development setup (installs all dev dependencies and pre-commit hooks)
+make setup
 
-3. Set up pre-commit hooks
-   ```bash
-   pre-commit install
-   ```
+# Or install only dependencies without pre-commit hooks
+make dev-install
+
+# If you prefer not to use Poetry
+pip install -r dev-requirements.txt
+pre-commit install
+```
+
+### Code Formatting and Quality Tools
+
+The project uses multiple tools to ensure code quality:
+
+```bash
+# Format code (black, isort, ruff)
+make format
+
+# Lint code (ruff)
+make lint
+
+# Type check (mypy)
+make type-check
+
+# Security check (bandit)
+make security
+
+# Run all quality checks at once
+make lint type-check security
+```
 
 ### Testing
 
@@ -144,13 +188,25 @@ Run tests with pytest:
 
 ```bash
 # Run all tests
-poetry run pytest
+make test
 
 # Run tests with coverage
-poetry run pytest --cov=my_python_package
+make test-cov
 
-# Run doctests
-poetry run pytest --doctest-modules src/
+# Run tests in multiple Python environments
+make tox
+```
+
+#### Test Categories
+
+You can run specific test categories using pytest markers:
+
+```bash
+# Run only fast tests (skip slow ones)
+pytest -m "not slow"
+
+# Run only integration tests
+pytest -m "integration"
 ```
 
 ### Documentation
@@ -159,40 +215,63 @@ Generate documentation:
 
 ```bash
 # Generate HTML documentation
-poetry run python scripts/generate_docs.py
+make docs
 
-# Generate Markdown documentation
-poetry run python scripts/generate_docs.py --format markdown
+# Or use the script directly with options
+python scripts/generate_docs.py --format markdown --output-dir docs/markdown
 ```
 
-### Code Quality
-
-Run linting and type checking:
+### Package Management
 
 ```bash
-# Format code
-poetry run ruff format .
+# Build the package
+make build
 
-# Lint code
-poetry run ruff check .
+# Publish to TestPyPI
+make publish-test
 
-# Type check
-poetry run mypy src tests
+# Publish to PyPI
+make publish
 ```
 
-You can also use the included Makefile:
+### Version Management
+
+Automatically bump the package version:
 
 ```bash
-# Format and lint
-make format
-make lint
+# Patch version (0.1.0 -> 0.1.1)
+make bump-patch
 
-# Type check
-make type-check
+# Minor version (0.1.0 -> 0.2.0)
+make bump-minor
 
-# Run tests with coverage
-make test-cov
+# Major version (0.1.0 -> 1.0.0)
+make bump-major
 ```
+
+### Dependency Management
+
+Check and update dependencies:
+
+```bash
+# Check for missing or unused dependencies
+make check-deps
+```
+
+## Continuous Integration
+
+The repository includes GitHub Actions for:
+
+1. **Testing**: Runs the test suite on multiple Python versions
+2. **Code Coverage**: Tracks and reports test coverage
+3. **Style Checking**: Ensures code follows the project's style guidelines
+4. **Security Scanning**: Checks for vulnerabilities in code and dependencies
+5. **Version Bumping**: Automatically bumps version on push to main based on commit message:
+   - `BREAKING CHANGE` → major version bump
+   - `feat:` prefix → minor version bump
+   - Otherwise → patch version bump
+6. **Dependency Updates**: Weekly PR to update dependency constraints to latest
+7. **Release Automation**: Automates PyPI releases when a version tag is pushed
 
 ## Project Structure
 
@@ -206,9 +285,14 @@ my_python_package/
 ├── CONTRIBUTORS.md           # List of contributors
 ├── .gitignore                # Git ignore rules
 ├── .pre-commit-config.yaml   # Pre-commit hooks configuration
+├── .editorconfig             # Editor configuration
+├── setup.cfg                 # Configuration for various tools
+├── tox.ini                   # Multi-environment testing
 ├── Makefile                  # Common development tasks
 ├── Dockerfile                # Docker container definition
 ├── docker-compose.yml        # Docker services configuration
+├── requirements.txt          # Dependencies for simple installation
+├── dev-requirements.txt      # Development dependencies
 ├── src/
 │   └── my_python_package/    # Package source code
 │       ├── __init__.py       # Package exports
@@ -235,25 +319,36 @@ my_python_package/
     └── workflows/            # CI/CD workflows
         ├── test.yml          # Run tests on push/PR
         ├── code-coverage.yml # Track code coverage
+        ├── style-check.yml   # Check code style
+        ├── security-scan.yml # Security scanning
         ├── release.yml       # PyPI release automation
         ├── dependency-scanning.yml # Security scanning
         ├── auto-pyproject-update.yml  # Version bumping
         └── auto-upgrade-pyproject.yml # Dependency upgrades
 ```
 
-## Automated Workflows
+## Tool Configuration
 
-The repository includes GitHub Actions for:
+The project includes configuration for several development tools:
 
-1. **Testing**: Runs the test suite on multiple Python versions
-2. **Code Coverage**: Tracks and reports test coverage
-3. **Version Bumping**: Automatically bumps version on push to main based on commit message:
-   - `BREAKING CHANGE` → major version bump
-   - `feat:` prefix → minor version bump
-   - Otherwise → patch version bump
-4. **Dependency Updates**: Weekly PR to update dependency constraints to latest
-5. **Security Scanning**: Regular checks for vulnerable dependencies
-6. **Release Automation**: Automates PyPI releases when a version tag is pushed
+### Code Style and Quality
+
+- **Black**: Consistent code formatting with a line length of 100
+- **isort**: Import sorting with Black compatibility
+- **Ruff**: Fast Python linter that combines multiple tools (flake8, pycodestyle, etc.)
+- **mypy**: Static type checking with strict settings
+- **Bandit**: Security vulnerability scanning
+
+### Testing
+
+- **pytest**: Test framework with coverage reporting
+- **tox**: Multi-environment testing
+- **Coverage**: Code coverage tracking and reporting
+
+### CI/CD
+
+- **GitHub Actions**: Automated workflows for testing, linting, and releasing
+- **pre-commit**: Automated checks before committing code
 
 ## Contributing
 
