@@ -7,37 +7,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
-
-- Command-line interface with multiple commands
-- Enhanced greeting functions with various options
-- Documentation generation script
-- Docker and docker-compose setup
-- Makefile for common development tasks
-- GitHub workflows for testing and CI
-- Pre-commit hooks configuration
+- Enhanced development tooling with Black, isort, Bandit, and pre-commit hooks
+- Added tox.ini for multi-environment testing
+- Added .editorconfig for consistent coding style
+- Added security scanning GitHub workflow
+- Added style checking GitHub workflow
+- Added dev-requirements.txt for easier non-Poetry installation
+- Enhanced documentation in README.md for development workflow
+- Improved GitHub issue and PR templates
 
 ### Changed
+- Updated Makefile with additional commands for development tasks
+- Enhanced pyproject.toml with more comprehensive configurations
+- Improved code quality settings with stricter linting rules
 
-- Improved project structure and documentation
-- Updated dependency management to use Poetry groups
+### Fixed
+- Fixed GitHub Actions permissions for the code coverage workflow
 
 ## [0.1.1] - 2025-08-14
 
 ### Added
-
 - Initial package structure
 - Basic hello function
 - Testing setup with pytest
 - Automated dependency management scripts
 
 ### Changed
-
 - Updated pyproject.toml to use modern Poetry configuration
 
 ## [0.1.0] - 2025-08-01
 
 ### Added
-
 - Initial release
 - Basic project structure
 - MIT License
