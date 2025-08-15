@@ -96,7 +96,12 @@ def get_docstring(node: ast.AST) -> Optional[str]:
             return None
         first_node = node.body[0]
         if isinstance(first_node, ast.Expr) and isinstance(first_node.value, ast.Str):
-            return first_node.value.s
+        if isinstance(first_node, ast.Expr):
+            if (
+                isinstance(first_node.value, ast.Str)
+                or (isinstance(first_node.value, ast.Constant) and isinstance(first_node.value.value, str))
+            ):
+                return first_node.value.s if hasattr(first_node.value, "s") else first_node.value.value
         return None
     except (AttributeError, IndexError):
         return None
