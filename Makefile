@@ -1,4 +1,4 @@
-.PHONY: help install format lint type-check test test-cov clean build publish-test publish setup dev-install security docs tox
+.PHONY: help install format lint type-check test test-cov clean build publish-test publish setup dev-install security docs tox docs-api docs-build docs-live
 
 help:
 	@echo "Available commands:"
@@ -12,20 +12,23 @@ help:
 	@echo "  make test-cov     Run tests with coverage"
 	@echo "  make tox          Run tests in multiple Python environments"
 	@echo "  make security     Run security checks with bandit"
-	@echo "  make docs         Generate documentation"
+	@echo "  make docs         Generate documentation with pdoc"
+	@echo "  make docs-api     Generate Sphinx API documentation"
+	@echo "  make docs-build   Build Sphinx documentation"
+	@echo "  make docs-live    Run a live server for Sphinx documentation"
 	@echo "  make clean        Remove build artifacts"
 	@echo "  make build        Build package"
 	@echo "  make publish-test Publish to TestPyPI"
 	@echo "  make publish      Publish to PyPI"
 
 install:
-	poetry install --no-dev
+	poetry install --without dev,docs
 
 dev-install:
-	poetry install
+	poetry install --with dev
 
 setup:
-	poetry install
+	poetry install --with dev
 	pre-commit install
 
 format:
@@ -54,10 +57,23 @@ security:
 docs:
 	poetry run python scripts/generate_docs.py
 
+docs-api:
+	cd docs && python make_api_docs.py
+
+docs-build:
+	poetry install --with docs
+	cd docs && $(MAKE) html
+
+docs-live:
+	poetry install --with docs
+	cd docs && $(MAKE) livehtml
+
 clean:
 	rm -rf build/
 	rm -rf dist/
 	rm -rf *.egg-info
+	rm -rf docs/_build/
+	rm -rf docs/api/
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 

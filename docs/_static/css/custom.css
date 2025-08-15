@@ -1,0 +1,119 @@
+/* Custom styles for my_python_package documentation */
+
+/* Improve code block appearance */
+div[class^="highlight"] {
+    border-radius: 4px;
+    border-left: 3px solid #2980b9;
+}
+
+/* Make tables look better */
+table.docutils {
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    margin-bottom: 24px;
+}
+
+table.docutils th {
+    background-color: #2980b9;
+    color: white;
+    border: none;
+}
+
+/* Improve admonitions */
+.admonition {
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.admonition-title {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.admonition.note .admonition-title {
+    background-color: #2980b9;
+}
+
+.admonition.warning .admonition-title {
+    background-color: #f39c12;
+}
+
+.admonition.error .admonition-title {
+    background-color: #e74c3c;
+}
+
+.admonition.tip .admonition-title {
+    background-color: #27ae60;
+}
+
+/* Improve function signatures */
+dl.py.function, dl.py.class, dl.py.method {
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 3px solid #2980b9;
+    background-color: #f5f5f5;
+    margin-bottom: 20px;
+}
+
+dl.py.function dt, dl.py.class dt, dl.py.method dt {
+    background-color: #e8f0f9;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+/* Improve navigation */
+.wy-nav-side {
+    background-color: #1a242f;
+}
+
+.wy-menu-vertical li.current {
+    background-color: #f5f5f5;
+}
+
+.wy-menu-vertical li.current > a {
+    border-color: #2980b9;
+}
+
+/* Make headings more readable */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto', sans-serif;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.3em;
+}
+
+/* Custom class for module overview boxes */
+.module-overview {
+    background-color: #f8f9fa;
+    border-left: 3px solid #2980b9;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.module-overview h3 {
+    margin-top: 0;
+    color: #2980b9;
+}
+
+/* Make function parameters stand out */
+.field-list {
+    border-left: 2px solid #2980b9;
+    padding-left: 10px;
+}
+
+/* Improve warning boxes */
+div.warning {
+    background-color: #fef9e7;
+}
+
+/* Add version selector styling */
+.rst-versions {
+    border-top: solid 10px #2980b9;
+}
