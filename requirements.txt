@@ -2,4 +2,4 @@
 # To update, run:
 #     poetry export -f requirements.txt --without-hashes -o requirements.txt
 
-my_python_package>=0.3.0
+greeting-toolkit>=0.3.0

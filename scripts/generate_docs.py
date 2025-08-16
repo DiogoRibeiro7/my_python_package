@@ -43,7 +43,7 @@ def check_pdoc_installed() -> bool:
 def generate_docs(
     format_type: Literal["html", "markdown"] = "html",
     output_dir: Optional[Path] = None,
-    package_name: str = "my_python_package",
+    package_name: str = "greeting_toolkit",
 ) -> bool:
     """
     Generate documentation using pdoc.

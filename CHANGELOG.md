@@ -27,6 +27,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed GitHub Actions permissions for the code coverage workflow
 
+### Migration
+
+- Renamed package from `my_python_package` to `greeting-toolkit`. Update imports to `greeting_toolkit` and CLI usage to `greeting-toolkit`.
+
 ## [0.1.1] - 2025-08-14
 
 ### Added
@@ -48,6 +52,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Basic project structure
 - MIT License
 
-[0.1.0]: https://github.com/DiogoRibeiro7/my_python_package/releases/tag/v0.1.0
-[0.1.1]: https://github.com/DiogoRibeiro7/my_python_package/compare/v0.1.0...v0.1.1
-[unreleased]: https://github.com/DiogoRibeiro7/my_python_package/compare/v0.1.1...HEAD
+[0.1.0]: https://github.com/DiogoRibeiro7/greeting-toolkit/releases/tag/v0.1.0
+[0.1.1]: https://github.com/DiogoRibeiro7/greeting-toolkit/compare/v0.1.0...v0.1.1
+[unreleased]: https://github.com/DiogoRibeiro7/greeting-toolkit/compare/v0.1.1...HEAD

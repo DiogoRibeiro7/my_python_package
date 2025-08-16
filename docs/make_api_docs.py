@@ -18,7 +18,7 @@ from typing import List, Set
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-PACKAGE_NAME = "my_python_package"
+PACKAGE_NAME = "greeting_toolkit"
 API_DIR = Path(__file__).parent / "api"
 
 

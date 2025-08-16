@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from my_python_package.core import (
+from greeting_toolkit.core import (
     create_greeting_list,
     format_greeting,
     generate_greeting,
@@ -56,7 +56,7 @@ def test_hello_invalid_type():
 )
 def test_generate_greeting_time_based(hour, expected_prefix):
     """Test time-based greetings at different hours."""
-    with patch("my_python_package.core.datetime") as mock_datetime:
+    with patch("greeting_toolkit.core.datetime") as mock_datetime:
         mock_datetime.now.return_value = datetime(2025, 1, 1, hour, 0, 0)
         result = generate_greeting("John", time_based=True)
         assert result == f"{expected_prefix}, John!"
@@ -117,7 +117,7 @@ def test_create_greeting_list_empty():
 # Random greeting test
 def test_random_greeting():
     """Test random greeting selection."""
-    with patch("my_python_package.core.random.choice", return_value="Hi"):
+    with patch("greeting_toolkit.core.secrets.choice", return_value="Hi"):
         result = random_greeting("John")
         assert result == "Hi, John!"
 

@@ -2,7 +2,7 @@
 Contributing
 ============
 
-Thank you for considering contributing to ``my_python_package``! This page provides guidelines for contributing to the project.
+Thank you for considering contributing to ``greeting_toolkit``! This page provides guidelines for contributing to the project.
 
 Code of Conduct
 --------------

@@ -1,31 +1,31 @@
 # API Reference
 
-This page documents the public API of `my_python_package`.
+This page documents the public API of `greeting_toolkit`.
 
 ## Core Functions
 
-::: my_python_package.core
+::: greeting_toolkit.core
     options:
       show_root_heading: true
       show_source: true
 
 ## Configuration
 
-::: my_python_package.config
+::: greeting_toolkit.config
     options:
       show_root_heading: true
       show_source: true
 
 ## Logging
 
-::: my_python_package.logging
+::: greeting_toolkit.logging
     options:
       show_root_heading: true
       show_source: true
 
 ## Command Line Interface
 
-::: my_python_package.cli
+::: greeting_toolkit.cli
     options:
       show_root_heading: true
       show_source: true

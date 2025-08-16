@@ -2,7 +2,6 @@
 
 import importlib
 import re
-import sys
 from unittest.mock import patch
 
 import pytest
@@ -13,7 +12,7 @@ import greeting_toolkit
 def test_package_version():
     """Test that the package has a valid version string."""
     assert hasattr(greeting_toolkit, "__version__")
-    assert isinstance(greeting_toolkit, str)
+    assert isinstance(greeting_toolkit.__version__, str)
     # Check that it follows semantic versioning (major.minor.patch)
     assert re.match(r"^\d+\.\d+\.\d+", greeting_toolkit.__version__)
 
@@ -55,10 +54,7 @@ def test_module_imports():
     importlib.reload(greeting_toolkit)
 
     # Test importing submodules
-    from greeting_toolkit import config
-    from greeting_toolkit import core
-    from greeting_toolkit import cli
-    from greeting_toolkit import logging
+    from greeting_toolkit import cli, config, core, logging
 
     # Verify the modules loaded correctly
     assert hasattr(config, "Config")
@@ -93,12 +89,8 @@ def test_direct_execution():
     try:
         # Set up the module as if it's being run directly
         with patch.object(greeting_toolkit, "__name__", "__main__"):
-            with patch("greeting_toolkit._main") as mock_main:
-                # Re-execute the module code
+            with pytest.raises(SystemExit):
                 exec(open(greeting_toolkit.__file__).read(), vars(greeting_toolkit))
-
-                # Verify _main was called
-                mock_main.assert_called_once()
     finally:
         # Restore original __name__
         greeting_toolkit.__name__ = original_name

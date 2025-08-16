@@ -14,13 +14,13 @@ sys.path.insert(0, os.path.abspath("../src"))
 
 # -- Project information -----------------------------------------------------
 
-project = "my_python_package"
+project = "greeting-toolkit"
 copyright = f"{datetime.now().year}, Diogo Ribeiro"
 author = "Diogo Ribeiro"
 
 # The full version, including alpha/beta/rc tags
 try:
-    from my_python_package import __version__
+    from greeting_toolkit import __version__
 
     release = __version__
 except ImportError:

@@ -2,7 +2,7 @@
 Command Line Interface
 =======================
 
-``my_python_package`` provides a command-line interface (CLI) for easy access to its functionality.
+``greeting_toolkit`` provides a command-line interface (CLI) for easy access to its functionality.
 
 Basic Usage
 ----------
@@ -11,7 +11,7 @@ The basic syntax for the CLI is:
 
 .. code-block:: bash
 
-    my-python-package COMMAND [ARGS] [OPTIONS]
+    greeting-toolkit COMMAND [ARGS] [OPTIONS]
 
 Available Commands
 -----------------
@@ -23,16 +23,16 @@ Generate a simple greeting:
 
 .. code-block:: bash
 
-    my-python-package hello NAME [--greeting GREETING]
+    greeting-toolkit hello NAME [--greeting GREETING]
 
 Examples:
 
 .. code-block:: bash
 
-    my-python-package hello World
+    greeting-toolkit hello World
     # Output: Hello, World!
 
-    my-python-package hello Python --greeting Hi
+    greeting-toolkit hello Python --greeting Hi
     # Output: Hi, Python!
 
 random
@@ -42,13 +42,13 @@ Generate a random greeting:
 
 .. code-block:: bash
 
-    my-python-package random NAME
+    greeting-toolkit random NAME
 
 Example:
 
 .. code-block:: bash
 
-    my-python-package random World
+    greeting-toolkit random World
     # Output varies with each run
 
 time
@@ -58,19 +58,19 @@ Generate a time-based greeting:
 
 .. code-block:: bash
 
-    my-python-package time NAME [--formal]
+    greeting-toolkit time NAME [--formal]
 
 Examples:
 
 .. code-block:: bash
 
-    my-python-package time World
+    greeting-toolkit time World
     # Output depends on time of day:
     # Morning: "Good morning, World!"
     # Afternoon: "Good afternoon, World!"
     # Evening: "Good evening, World!"
 
-    my-python-package time Mrs.Smith --formal
+    greeting-toolkit time Mrs.Smith --formal
     # Output: "Good day, Mr./Ms. Mrs.Smith!"
 
 format
@@ -80,7 +80,7 @@ Format a greeting with various options:
 
 .. code-block:: bash
 
-    my-python-package format NAME
+    greeting-toolkit format NAME
                        [--greeting GREETING]
                        [--punctuation PUNCTUATION]
                        [--uppercase]
@@ -90,13 +90,13 @@ Examples:
 
 .. code-block:: bash
 
-    my-python-package format World
+    greeting-toolkit format World
     # Output: Hello, World!
 
-    my-python-package format World --greeting Welcome --punctuation "!!!" --uppercase
+    greeting-toolkit format World --greeting Welcome --punctuation "!!!" --uppercase
     # Output: WELCOME, WORLD!!!
 
-    my-python-package format "Very Long Name" --max-length 15
+    greeting-toolkit format "Very Long Name" --max-length 15
     # Output: Hello, Very...
 
 multi
@@ -106,19 +106,19 @@ Greet multiple names:
 
 .. code-block:: bash
 
-    my-python-package multi NAME1 NAME2 ... [--greeting GREETING]
+    greeting-toolkit multi NAME1 NAME2 ... [--greeting GREETING]
 
 Example:
 
 .. code-block:: bash
 
-    my-python-package multi Alice Bob Charlie
+    greeting-toolkit multi Alice Bob Charlie
     # Output:
     # Hello, Alice!
     # Hello, Bob!
     # Hello, Charlie!
 
-    my-python-package multi Alice Bob --greeting "Greetings"
+    greeting-toolkit multi Alice Bob --greeting "Greetings"
     # Output:
     # Greetings, Alice!
     # Greetings, Bob!
@@ -130,7 +130,7 @@ Manage configuration settings:
 
 .. code-block:: bash
 
-    my-python-package config SUBCOMMAND [OPTIONS]
+    greeting-toolkit config SUBCOMMAND [OPTIONS]
 
 Subcommands:
 
@@ -145,28 +145,28 @@ Examples:
 .. code-block:: bash
 
     # Show current configuration
-    my-python-package config show
+    greeting-toolkit config show
 
     # Set default greeting
-    my-python-package config set --greeting "Howdy"
+    greeting-toolkit config set --greeting "Howdy"
 
     # Set default punctuation
-    my-python-package config set --punctuation "?"
+    greeting-toolkit config set --punctuation "?"
 
     # Set formal title
-    my-python-package config set --title "Dr. "
+    greeting-toolkit config set --title "Dr. "
 
     # Set maximum name length
-    my-python-package config set --max-name-length 30
+    greeting-toolkit config set --max-name-length 30
 
     # Add a greeting
-    my-python-package config add-greeting "Salutations"
+    greeting-toolkit config add-greeting "Salutations"
 
     # Save configuration to file
-    my-python-package config save config.json
+    greeting-toolkit config save config.json
 
     # Load configuration from file
-    my-python-package config load config.json
+    greeting-toolkit config load config.json
 
 Global Options
 ------------
@@ -186,16 +186,16 @@ Examples:
 .. code-block:: bash
 
     # Show help for the hello command
-    my-python-package hello --help
+    greeting-toolkit hello --help
 
     # Show version information
-    my-python-package --version
+    greeting-toolkit --version
 
     # Set logging level
-    my-python-package hello World --log-level debug
+    greeting-toolkit hello World --log-level debug
 
     # Log to file
-    my-python-package hello World --log-file greeting.log
+    greeting-toolkit hello World --log-file greeting.log
 
 Advanced Usage
 ------------
@@ -211,15 +211,15 @@ You can use the CLI in shell scripts:
 
     # Greet all users in a file
     while read name; do
-        my-python-package hello "$name" --greeting "Welcome"
+        greeting-toolkit hello "$name" --greeting "Welcome"
     done < users.txt
 
     # Save and load configuration
-    my-python-package config set --greeting "Hi" --punctuation "!"
-    my-python-package config save my_config.json
+    greeting-toolkit config set --greeting "Hi" --punctuation "!"
+    greeting-toolkit config save my_config.json
 
     # Later, restore the configuration
-    my-python-package config load my_config.json
+    greeting-toolkit config load my_config.json
 
 Output Redirection
 ~~~~~~~~~~~~~~~~
@@ -229,10 +229,10 @@ You can redirect the output to files:
 .. code-block:: bash
 
     # Save greetings to a file
-    my-python-package multi Alice Bob Charlie > greetings.txt
+    greeting-toolkit multi Alice Bob Charlie > greetings.txt
 
     # Append more greetings
-    my-python-package hello Dave >> greetings.txt
+    greeting-toolkit hello Dave >> greetings.txt
 
 Error Handling
 ~~~~~~~~~~~~
@@ -242,6 +242,6 @@ The CLI will return non-zero exit codes on errors:
 .. code-block:: bash
 
     # Script example with error handling
-    if ! my-python-package hello ""; then
+    if ! greeting-toolkit hello ""; then
         echo "Failed to greet empty name"
     fi

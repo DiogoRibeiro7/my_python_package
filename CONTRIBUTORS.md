@@ -1,6 +1,6 @@
 # Contributors
 
-This file lists the contributors to the `my_python_package` project.
+This file lists the contributors to the `greeting-toolkit` project.
 
 ## Core Contributors
 
@@ -17,7 +17,7 @@ Template for new contributors:
 
 ## How to Contribute
 
-Thank you for considering contributing to `my_python_package`! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to this project.
+Thank you for considering contributing to `greeting-toolkit`! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to this project.
 
 ## Contributor License Agreement
 

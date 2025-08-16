@@ -1,10 +1,10 @@
-site_name: my_python_package
+site_name: greeting-toolkit
 site_description: A minimal but production-ready Python package scaffold
 site_author: Diogo Ribeiro
-site_url: https://my-python-package.readthedocs.io/
+site_url: https://greeting-toolkit.readthedocs.io/
 
-repo_name: DiogoRibeiro7/my_python_package
-repo_url: https://github.com/DiogoRibeiro7/my_python_package
+repo_name: DiogoRibeiro7/greeting-toolkit
+repo_url: https://github.com/DiogoRibeiro7/greeting-toolkit
 edit_uri: edit/main/docs/
 
 theme:
@@ -100,7 +100,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/DiogoRibeiro7
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/my-python-package/
+      link: https://pypi.org/project/greeting-toolkit/
 
 nav:
   - Home: index.md

@@ -1,4 +1,4 @@
-"""Command-line interface for my_python_package."""
+"""Command-line interface for greeting_toolkit."""
 
 import argparse
 import json
@@ -25,7 +25,7 @@ from .logging import configure_logging, logger
 def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        prog="my-python-package",
+        prog="greeting-toolkit",
         description="A simple greeting package",
     )
 

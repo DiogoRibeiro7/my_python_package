@@ -1,9 +1,10 @@
-# my_python_package
+# greeting-toolkit
 
-[![PyPI version](https://img.shields.io/pypi/v/my_python_package.svg) ![Docstring Coverage](https://img.shields.io/badge/docstring%20coverage-93.1%25-brightgreen)](https://pypi.org/project/my_python_package/)
-[![Python Versions](https://img.shields.io/pypi/pyversions/my_python_package.svg)](https://pypi.org/project/my_python_package/)
-[![Tests](https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml/badge.svg)](https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml)
-[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://codecov.io/gh/DiogoRibeiro7/my_python_package)
+[![PyPI version](https://img.shields.io/pypi/v/greeting-toolkit.svg)](https://pypi.org/project/greeting-toolkit/)
+![Docstring Coverage](https://img.shields.io/badge/docstring%20coverage-93.1%25-brightgreen)
+[![Python Versions](https://img.shields.io/pypi/pyversions/greeting-toolkit.svg)](https://pypi.org/project/greeting-toolkit/)
+[![Tests](https://github.com/DiogoRibeiro7/greeting-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/DiogoRibeiro7/greeting-toolkit/actions/workflows/test.yml)
+[![Coverage](https://codecov.io/gh/DiogoRibeiro7/greeting-toolkit/branch/main/graph/badge.svg)](https://codecov.io/gh/DiogoRibeiro7/greeting-toolkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Ruff](https://img.shields.io/badge/ruff-enabled-brightgreen)](https://github.com/astral-sh/ruff)
@@ -11,13 +12,13 @@
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-A minimal but production-ready Python package scaffold configured for publishing to [PyPI](https://pypi.org).
+**greeting-toolkit** is a minimal but production-ready Python package scaffold configured for publishing to [PyPI](https://pypi.org).
 
 ## Features
 
 - 🚀 Modern Python packaging with Poetry
 - 🔧 Configurable greeting functions with multiple formatting options
-- 🧪 Comprehensive testing suite with 100% coverage
+- 🧪 Comprehensive testing suite with over 95% coverage
 - 📊 Continuous Integration workflows for testing, coverage, and releases
 - 🛠️ Code quality tools preconfigured (black, ruff, mypy, isort, pre-commit)
 - 📝 Complete documentation with doctests
@@ -31,18 +32,18 @@ A minimal but production-ready Python package scaffold configured for publishing
 
 ```bash
 # Using pip
-pip install my_python_package
+pip install greeting-toolkit
 
 # Using Poetry
-poetry add my_python_package
+poetry add greeting-toolkit
 ```
 
 ### For Development
 
 ```bash
 # Clone the repository
-git clone https://github.com/DiogoRibeiro7/my_python_package.git
-cd my_python_package
+git clone https://github.com/DiogoRibeiro7/greeting-toolkit.git
+cd greeting-toolkit
 
 # Using Poetry (recommended)
 poetry install
@@ -59,7 +60,7 @@ make setup
 ### Basic Greeting
 
 ```python
-from my_python_package import hello
+from greeting_toolkit import hello
 
 # Basic usage
 greeting = hello("World")
@@ -73,7 +74,7 @@ print(custom)  # Output: Hi, Python!
 ### Formatted Greetings
 
 ```python
-from my_python_package import format_greeting
+from greeting_toolkit import format_greeting
 
 # Default formatting
 print(format_greeting("World"))  # Output: Hello, World!
@@ -93,7 +94,7 @@ print(format_greeting("Very Long Name", max_length=15))  # Output: Hello, Very..
 ### Multiple Greetings
 
 ```python
-from my_python_package import create_greeting_list
+from greeting_toolkit import create_greeting_list
 
 # Greet multiple people
 greetings = create_greeting_list(["Alice", "Bob", "Charlie"])
@@ -104,7 +105,7 @@ for greeting in greetings:
 ### Context-Aware Greetings
 
 ```python
-from my_python_package import generate_greeting
+from greeting_toolkit import generate_greeting
 
 # Time-based greeting (morning/afternoon/evening)
 print(generate_greeting("World", time_based=True))
@@ -116,7 +117,7 @@ print(generate_greeting("Mrs. Smith", formal=True))
 ### Random Greetings
 
 ```python
-from my_python_package import random_greeting
+from greeting_toolkit import random_greeting
 
 # Get a random greeting
 print(random_greeting("World"))  # Different greeting each time
@@ -128,19 +129,19 @@ The package also provides a command-line interface:
 
 ```bash
 # Basic greeting
-my-python-package hello World
+greeting-toolkit hello World
 
 # Random greeting
-my-python-package random World
+greeting-toolkit random World
 
 # Time-based greeting
-my-python-package time World --formal
+greeting-toolkit time World --formal
 
 # Multiple names
-my-python-package multi Alice Bob Charlie --greeting "Greetings"
+greeting-toolkit multi Alice Bob Charlie --greeting "Greetings"
 
 # Formatted greeting
-my-python-package format World --greeting "Welcome" --uppercase --max-length 15
+greeting-toolkit format World --greeting "Welcome" --uppercase --max-length 15
 ```
 
 ## Development
@@ -276,7 +277,7 @@ The repository includes GitHub Actions for:
 ## Project Structure
 
 ```text
-my_python_package/
+greeting_toolkit/
 ├── pyproject.toml            # Project metadata, dependencies
 ├── README.md                 # Project overview
 ├── LICENSE                   # MIT license
@@ -294,7 +295,7 @@ my_python_package/
 ├── requirements.txt          # Dependencies for simple installation
 ├── dev-requirements.txt      # Development dependencies
 ├── src/
-│   └── my_python_package/    # Package source code
+│   └── greeting_toolkit/    # Package source code
 │       ├── __init__.py       # Package exports
 │       ├── __main__.py       # Module execution entry point
 │       ├── core.py           # Core greeting functionality
