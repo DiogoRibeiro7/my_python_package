@@ -7,29 +7,29 @@ from unittest.mock import patch
 
 import pytest
 
-import my_python_package
+import greeting_toolkit
 
 
 def test_package_version():
     """Test that the package has a valid version string."""
-    assert hasattr(my_python_package, "__version__")
-    assert isinstance(my_python_package, str)
+    assert hasattr(greeting_toolkit, "__version__")
+    assert isinstance(greeting_toolkit, str)
     # Check that it follows semantic versioning (major.minor.patch)
-    assert re.match(r"^\d+\.\d+\.\d+", my_python_package.__version__)
+    assert re.match(r"^\d+\.\d+\.\d+", greeting_toolkit.__version__)
 
 
 def test_package_author():
     """Test that the package has an author string."""
-    assert hasattr(my_python_package, "__author__")
-    assert isinstance(my_python_package.__author__, str)
-    assert my_python_package.__author__ == "Diogo Ribeiro"
+    assert hasattr(greeting_toolkit, "__author__")
+    assert isinstance(greeting_toolkit.__author__, str)
+    assert greeting_toolkit.__author__ == "Diogo Ribeiro"
 
 
 def test_package_exports():
     """Test that the package exports the expected functions."""
     # Check __all__ contents
-    assert hasattr(my_python_package, "__all__")
-    assert isinstance(my_python_package.__all__, list)
+    assert hasattr(greeting_toolkit, "__all__")
+    assert isinstance(greeting_toolkit.__all__, list)
 
     # Check expected functions are in __all__
     expected_functions = [
@@ -41,24 +41,24 @@ def test_package_exports():
         "format_greeting",
     ]
     for func in expected_functions:
-        assert func in my_python_package.__all__
+        assert func in greeting_toolkit.__all__
 
     # Check functions are actually exported
-    for func in my_python_package.__all__:
-        assert hasattr(my_python_package, func)
-        assert callable(getattr(my_python_package, func))
+    for func in greeting_toolkit.__all__:
+        assert hasattr(greeting_toolkit, func)
+        assert callable(getattr(greeting_toolkit, func))
 
 
 def test_module_imports():
     """Test that all package imports work properly."""
     # Test importing the main module
-    importlib.reload(my_python_package)
+    importlib.reload(greeting_toolkit)
 
     # Test importing submodules
-    from my_python_package import config
-    from my_python_package import core
-    from my_python_package import cli
-    from my_python_package import logging
+    from greeting_toolkit import config
+    from greeting_toolkit import core
+    from greeting_toolkit import cli
+    from greeting_toolkit import logging
 
     # Verify the modules loaded correctly
     assert hasattr(config, "Config")
@@ -70,10 +70,10 @@ def test_module_imports():
 def test_main_function():
     """Test the _main function that handles module execution."""
     # Create a mock for sys.exit and cli.main
-    with patch("my_python_package.cli.main", return_value=42) as mock_main:
+    with patch("greeting_toolkit.cli.main", return_value=42) as mock_main:
         with patch("sys.exit") as mock_exit:
             # Call _main function
-            my_python_package._main()
+            greeting_toolkit._main()
 
             # Verify cli.main was called
             mock_main.assert_called_once()
@@ -88,20 +88,20 @@ def test_direct_execution():
     # but we can test the behavior indirectly by simulating it
 
     # Save original __name__
-    original_name = my_python_package.__name__
+    original_name = greeting_toolkit.__name__
 
     try:
         # Set up the module as if it's being run directly
-        with patch.object(my_python_package, "__name__", "__main__"):
-            with patch("my_python_package._main") as mock_main:
+        with patch.object(greeting_toolkit, "__name__", "__main__"):
+            with patch("greeting_toolkit._main") as mock_main:
                 # Re-execute the module code
-                exec(open(my_python_package.__file__).read(), vars(my_python_package))
+                exec(open(greeting_toolkit.__file__).read(), vars(greeting_toolkit))
 
                 # Verify _main was called
                 mock_main.assert_called_once()
     finally:
         # Restore original __name__
-        my_python_package.__name__ = original_name
+        greeting_toolkit.__name__ = original_name
 
 
 def test_doctest_examples():
@@ -109,7 +109,7 @@ def test_doctest_examples():
     import doctest
 
     # Run doctests on the module
-    result = doctest.testmod(my_python_package)
+    result = doctest.testmod(greeting_toolkit)
 
     # Verify all tests passed (failures == 0)
     assert result.failed == 0
