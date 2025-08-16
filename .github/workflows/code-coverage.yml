@@ -10,52 +10,52 @@ on:
 # Add permissions block here
 permissions:
   contents: write  # Needed to update the README.md file
-  
+
 jobs:
   coverage:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          
+
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          
+
       - name: Install dependencies
         run: |
           poetry install
-          
+
       - name: Run tests with coverage
         run: |
           poetry run pytest --cov=my_python_package --cov-report=xml --cov-report=term
-          
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
-          
+
       - name: Generate coverage badge
         run: |
           poetry run python -c "
           import xml.etree.ElementTree as ET
           import re
-          
+
           # Parse the coverage report
           tree = ET.parse('coverage.xml')
           root = tree.getroot()
-          
+
           # Get the overall coverage percentage
           coverage = float(root.get('line-rate')) * 100
-          
+
           # Create the badge markdown
           color = 'red'
           if coverage >= 90:
@@ -68,13 +68,13 @@ jobs:
               color = 'yellow'
           elif coverage >= 50:
               color = 'orange'
-              
+
           badge_url = f'https://img.shields.io/badge/coverage-{coverage:.1f}%25-{color}'
-          
+
           # Update README.md
           with open('README.md', 'r') as f:
               readme = f.read()
-              
+
           # Look for existing coverage badge
           coverage_badge_pattern = r'!\[Coverage\]\(https://img\.shields\.io/badge/coverage-[\d\.]+%25-[a-z]+\)'
           if re.search(coverage_badge_pattern, readme):
@@ -94,11 +94,11 @@ jobs:
                       readme = readme[:first_line_end+1] + f'\n![Coverage]({badge_url})\n' + readme[first_line_end+1:]
                   else:
                       readme = readme + f'\n\n![Coverage]({badge_url})\n'
-          
+
           with open('README.md', 'w') as f:
               f.write(readme)
           "
-          
+
       - name: Commit updated README with coverage badge
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |

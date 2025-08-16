@@ -30,7 +30,7 @@ Initial Setup
 
        # Using the Makefile (recommended)
        make setup
-       
+
        # Alternatively, manually:
        poetry install
        pre-commit install

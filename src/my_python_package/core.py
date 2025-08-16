@@ -30,17 +30,17 @@ def hello(name: str, greeting: Optional[str] = None) -> str:
 
         >>> hello("Python", greeting="Hi")
         'Hi, Python!'
-        
+
         >>> hello("")  # Empty name is allowed
         'Hello, !'
-        
+
         >>> try:
         ...     hello(123)  # type: ignore
         ...     assert False, "Should have raised TypeError"
         ... except TypeError:
         ...     True
         True
-        
+
         >>> try:
         ...     hello("World", greeting=123)  # type: ignore
         ...     assert False, "Should have raised TypeError"
@@ -53,7 +53,7 @@ def hello(name: str, greeting: Optional[str] = None) -> str:
         raise TypeError("Name must be a string")
     if greeting is not None and not isinstance(greeting, str):
         raise TypeError("Greeting must be a string")
-    
+
     greeting = greeting or config.default_greeting
     return f"{greeting}, {name}!"
 
@@ -74,7 +74,7 @@ def generate_greeting(name: str, formal: bool = False, time_based: bool = False)
         >>> # Formal greeting test
         >>> generate_greeting("John", formal=True)
         'Good day, Mr./Ms. John!'
-        
+
         >>> # Standard greeting
         >>> generate_greeting("John", formal=False, time_based=False)
         'Hello, John!'
@@ -85,7 +85,7 @@ def generate_greeting(name: str, formal: bool = False, time_based: bool = False)
         >>> bool(re.match(r'(Good (morning|afternoon|evening)|Hello), John!',
         ...               generate_greeting("John", time_based=True)))
         True
-        
+
         >>> # Both formal and time-based
         >>> with_title = generate_greeting("John", formal=True, time_based=True)
         >>> "Mr./Ms." in with_title
@@ -138,19 +138,19 @@ def validate_name(name: str) -> Tuple[bool, Optional[str]]:
         >>> # Contains numbers
         >>> validate_name("John123")
         (False, 'Name cannot contain numbers or special characters')
-        
+
         >>> # Contains special characters
         >>> validate_name("John@Doe")
         (False, 'Name cannot contain numbers or special characters')
-        
+
         >>> # Valid name with hyphen
         >>> validate_name("John-Doe")
         (True, None)
-        
+
         >>> # Valid name with space
         >>> validate_name("John Doe")
         (True, None)
-        
+
         >>> # Very long name (depends on config.max_name_length)
         >>> name = "A" * (config.max_name_length + 1)
         >>> result, error = validate_name(name)
@@ -193,15 +193,15 @@ def create_greeting_list(names: List[str], greeting: Optional[str] = None) -> Li
         >>> # Custom greeting
         >>> create_greeting_list(["Alice", "Bob"], greeting="Hi")
         ['Hi, Alice!', 'Hi, Bob!']
-        
+
         >>> # Empty list
         >>> create_greeting_list([])
         []
-        
+
         >>> # Mixed names
         >>> create_greeting_list(["Alice", "", "Bob"])
         ['Hello, Alice!', 'Hello, !', 'Hello, Bob!']
-        
+
         >>> # Single name
         >>> create_greeting_list(["Charlie"])
         ['Hello, Charlie!']
@@ -230,7 +230,7 @@ def random_greeting(name: str) -> str:
         True
         >>> any(g in greeting for g in config.available_greetings)
         True
-        
+
         >>> # Verify different calls give different results
         >>> # Reset the seed
         >>> random.seed(None)
@@ -281,18 +281,18 @@ def format_greeting(
         >>> # Length limit with truncation
         >>> format_greeting("Tremendously Long Name", max_length=20)
         'Hello, Tremendou...'
-        
+
         >>> # Multiple options
-        >>> format_greeting("Python", 
+        >>> format_greeting("Python",
         ...                 greeting="Welcome",
         ...                 punctuation="!!!",
         ...                 uppercase=True)
         'WELCOME, PYTHON!!!'
-        
+
         >>> # Very short max_length
         >>> format_greeting("World", max_length=5)
         '...'
-        
+
         >>> # Max length that doesn't require truncation
         >>> format_greeting("John", max_length=100)
         'Hello, John!'
@@ -303,7 +303,7 @@ def format_greeting(
     # Build the full greeting first
     result = f"{greeting}, {name}{punctuation}"
 
-    # Apply truncation BEFORE uppercase 
+    # Apply truncation BEFORE uppercase
     if max_length is not None and len(result) > max_length:
         if max_length <= 3:
             result = "..."
@@ -327,20 +327,20 @@ def set_default_greeting(greeting: str) -> None:
 
     Args:
         greeting: New default greeting
-        
+
     Examples:
         >>> # Save original greeting
         >>> original = config.default_greeting
-        >>> 
+        >>>
         >>> # Set a new greeting
         >>> set_default_greeting("Howdy")
         >>> config.default_greeting
         'Howdy'
-        >>> 
+        >>>
         >>> # Verify it's used by default
         >>> hello("World")
         'Howdy, World!'
-        >>> 
+        >>>
         >>> # Reset to original
         >>> set_default_greeting(original)
     """
@@ -352,20 +352,20 @@ def set_default_punctuation(punctuation: str) -> None:
 
     Args:
         punctuation: The punctuation character to set as default.
-        
+
     Examples:
         >>> # Save original punctuation
         >>> original = config.default_punctuation
-        >>> 
+        >>>
         >>> # Set new punctuation
         >>> set_default_punctuation("?")
         >>> config.default_punctuation
         '?'
-        >>> 
+        >>>
         >>> # Verify it's used by default
         >>> format_greeting("World")
         'Hello, World?'
-        >>> 
+        >>>
         >>> # Reset to original
         >>> set_default_punctuation(original)
     """
@@ -377,22 +377,22 @@ def add_greeting(greeting: str) -> None:
 
     Args:
         greeting: Greeting to add
-        
+
     Examples:
         >>> # Save original greetings
         >>> original = config.available_greetings.copy()
-        >>> 
+        >>>
         >>> # Add a new greeting
         >>> add_greeting("Greetings")
         >>> "Greetings" in config.available_greetings
         True
-        >>> 
+        >>>
         >>> # Adding a duplicate does nothing
         >>> original_length = len(config.available_greetings)
         >>> add_greeting("Greetings")
         >>> len(config.available_greetings) == original_length
         True
-        >>> 
+        >>>
         >>> # Reset to original
         >>> config.available_greetings = original
     """
@@ -407,13 +407,13 @@ def get_config() -> Dict[str, Any]:
 
     Returns:
         Configuration dictionary
-        
+
     Examples:
         >>> # Get configuration
         >>> cfg = get_config()
         >>> isinstance(cfg, dict)
         True
-        >>> 
+        >>>
         >>> # Verify keys
         >>> "default_greeting" in cfg
         True

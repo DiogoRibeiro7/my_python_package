@@ -10,32 +10,32 @@ on:
 jobs:
   style:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          
+
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          
+
       - name: Install dependencies
         run: |
           poetry install
-          
+
       - name: Run black
         run: |
           poetry run black --check --diff src tests
-          
+
       - name: Run isort
         run: |
           poetry run isort --check-only --diff src tests
-          
+
       - name: Run ruff
         run: |
           poetry run ruff check src tests

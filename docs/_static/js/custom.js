@@ -7,16 +7,16 @@ document.addEventListener('DOMContentLoaded', function() {
         var button = document.createElement('button');
         button.className = 'copy-button';
         button.textContent = 'Copy';
-        
+
         // Add the button to the code block
         codeBlock.appendChild(button);
-        
+
         // Add click event listener to the button
         button.addEventListener('click', function() {
             // Find the <code> element within the code block
             var code = codeBlock.querySelector('code');
             var text = code.innerText;
-            
+
             // Create a temporary textarea element to copy the text
             var textarea = document.createElement('textarea');
             textarea.value = text;
@@ -24,24 +24,24 @@ document.addEventListener('DOMContentLoaded', function() {
             textarea.style.position = 'absolute';
             textarea.style.left = '-9999px';
             document.body.appendChild(textarea);
-            
+
             // Select and copy the text
             textarea.select();
             document.execCommand('copy');
-            
+
             // Remove the textarea
             document.body.removeChild(textarea);
-            
+
             // Change the button text to indicate success
             button.textContent = 'Copied!';
-            
+
             // Reset the button text after a delay
             setTimeout(function() {
                 button.textContent = 'Copy';
             }, 2000);
         });
     });
-    
+
     // Add styles for the copy button
     var style = document.createElement('style');
     style.textContent = `
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(style);
-    
+
     // Add anchor links to headings
     document.querySelectorAll('h2, h3, h4, h5, h6').forEach(function(heading) {
         if (heading.id) {
@@ -80,18 +80,18 @@ document.addEventListener('DOMContentLoaded', function() {
             link.href = '#' + heading.id;
             link.title = 'Permalink to this heading';
             link.innerHTML = '¶';
-            
+
             // Add the link to the heading
             heading.appendChild(link);
         }
     });
-    
+
     // Add example collapsers
     document.querySelectorAll('.admonition.example').forEach(function(example) {
         var title = example.querySelector('.admonition-title');
         if (title) {
             title.style.cursor = 'pointer';
-            
+
             // Create a toggle button
             var toggle = document.createElement('span');
             toggle.className = 'example-toggle';
@@ -99,18 +99,18 @@ document.addEventListener('DOMContentLoaded', function() {
             toggle.style.float = 'right';
             toggle.style.marginRight = '5px';
             title.appendChild(toggle);
-            
+
             // Add click event listener to the title
             title.addEventListener('click', function() {
                 // Find the content of the example
                 var content = example.querySelectorAll(':scope > *:not(.admonition-title)');
-                
+
                 // Toggle the visibility of the content
                 var isVisible = content[0].style.display !== 'none';
                 content.forEach(function(element) {
                     element.style.display = isVisible ? 'none' : '';
                 });
-                
+
                 // Update the toggle button
                 toggle.innerHTML = isVisible ? '[+]' : '[-]';
             });

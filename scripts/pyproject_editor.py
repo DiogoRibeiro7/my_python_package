@@ -50,10 +50,10 @@ class Paths:
 def _ensure_file(p: Path) -> None:
     """
     Verify that a path exists and is a file.
-    
+
     Args:
         p: Path to check
-        
+
     Raises:
         FileNotFoundError: If the file doesn't exist
         IsADirectoryError: If the path is a directory
@@ -67,13 +67,13 @@ def _ensure_file(p: Path) -> None:
 def _load_doc(path: Path) -> TOMLDocument:
     """
     Load a TOML document from a file.
-    
+
     Args:
         path: Path to the TOML file
-        
+
     Returns:
         Parsed TOML document
-        
+
     Raises:
         UnicodeDecodeError: If the file cannot be decoded as UTF-8
         tomlkit.exceptions.TOMLKitError: If the TOML syntax is invalid
@@ -85,10 +85,10 @@ def _load_doc(path: Path) -> TOMLDocument:
 def _dump_doc(doc: TOMLDocument) -> str:
     """
     Serialize a TOML document to a string.
-    
+
     Args:
         doc: TOML document to serialize
-        
+
     Returns:
         Formatted TOML string with comments preserved
     """
@@ -101,15 +101,15 @@ def _detect_layout(doc: TOMLDocument) -> Literal["poetry", "pep621"]:
     Return which layout the pyproject uses for metadata:
     - "poetry" if [tool.poetry] exists
     - "pep621" if [project] exists
-    
+
     We prefer Poetry if both exist.
-    
+
     Args:
         doc: TOML document to check
-        
+
     Returns:
         Layout type ("poetry" or "pep621")
-        
+
     Raises:
         ValueError: If neither layout is found
     """
@@ -123,13 +123,13 @@ def _detect_layout(doc: TOMLDocument) -> Literal["poetry", "pep621"]:
 def _get_version(doc: TOMLDocument) -> str:
     """
     Get the version from the document, respecting the layout.
-    
+
     Args:
         doc: TOML document to extract version from
-        
+
     Returns:
         Version string
-        
+
     Raises:
         KeyError: If the version field is missing
         TypeError: If the version is not a string
@@ -142,7 +142,7 @@ def _get_version(doc: TOMLDocument) -> str:
             v = doc["project"].get("version")
     except KeyError:
         raise KeyError(f"Version field not found in [{layout}] section")
-        
+
     if v is None:
         raise KeyError(f"Version field not found in [{layout}] section")
     if not isinstance(v, str):
@@ -153,11 +153,11 @@ def _get_version(doc: TOMLDocument) -> str:
 def _set_version(doc: TOMLDocument, version: str) -> None:
     """
     Set the version in the document, respecting the layout.
-    
+
     Args:
         doc: TOML document to modify
         version: New version string to set
-        
+
     Raises:
         KeyError: If required sections are missing
     """
@@ -175,14 +175,14 @@ def _bump_semver(v: str, level: VersionBump) -> str:
     """
     Minimal semantic version bump for MAJOR.MINOR.PATCH[rest].
     'rest' (like -rc.1) is dropped on bump to keep things predictable.
-    
+
     Args:
         v: Version string in semver format
         level: Which part to bump (major, minor, or patch)
-        
+
     Returns:
         New version string
-        
+
     Raises:
         ValueError: If the version string doesn't match MAJOR.MINOR.PATCH pattern
         ValueError: If the bump level is invalid
@@ -190,12 +190,12 @@ def _bump_semver(v: str, level: VersionBump) -> str:
     m = VERSION_PATTERN.match(v)
     if not m:
         raise ValueError(f"Version '{v}' is not in MAJOR.MINOR.PATCH[suffix] format.")
-    
+
     try:
         maj, min_, pat = int(m["maj"]), int(m["min"]), int(m["pat"])
     except ValueError:
         raise ValueError(f"Version components must be integers in '{v}'")
-        
+
     if level == "major":
         maj, min_, pat = maj + 1, 0, 0
     elif level == "minor":
@@ -204,7 +204,7 @@ def _bump_semver(v: str, level: VersionBump) -> str:
         pat = pat + 1
     else:
         raise ValueError(f"Unknown bump level: {level}. Must be major, minor, or patch.")
-    
+
     return f"{maj}.{min_}.{pat}"
 
 
@@ -215,17 +215,17 @@ def _get_poetry_dep_table(doc: TOMLDocument, group: Optional[str]) -> tomlkit.it
       - main deps: [tool.poetry.dependencies]
       - dev deps (legacy): [tool.poetry.dev-dependencies]
       - named groups: [tool.poetry.group.<group>.dependencies]
-      
+
     Args:
         doc: TOML document to get table from
         group: Group name or None for main dependencies
-        
+
     Returns:
         Table object for the dependencies
     """
     tool = doc.setdefault("tool", tomlkit.table())
     poetry = tool.setdefault("poetry", tomlkit.table())
-    
+
     if group is None or group == "main":
         return poetry.setdefault("dependencies", tomlkit.table())
 
@@ -243,20 +243,20 @@ def _ensure_pep621_arrays(doc: TOMLDocument) -> Tuple[tomlkit.items.Array, tomlk
     """
     Return (project.dependencies Array, project.optional-dependencies Table).
     Create them if missing.
-    
+
     Args:
         doc: TOML document to get arrays from
-        
+
     Returns:
         Tuple of (dependencies array, optional-dependencies table)
-        
+
     Raises:
         TypeError: If the dependencies is not an array or optional-dependencies is not a table
     """
     project = doc.setdefault("project", tomlkit.table())
     deps = project.setdefault("dependencies", tomlkit.array())
     opt = project.setdefault("optional-dependencies", tomlkit.table())
-    
+
     # Typing guards:
     if not isinstance(deps, tomlkit.items.Array):
         raise TypeError("[project.dependencies] must be an array.")
@@ -270,13 +270,13 @@ def _set_dep(doc: TOMLDocument, name: str, spec: str, group: Optional[str]) -> N
     Set or update a dependency across layouts.
     - Poetry: name = {version = spec} or name = spec (string)
     - PEP 621: strings like "name spec" in arrays
-    
+
     Args:
         doc: TOML document to modify
         name: Package name
         spec: Version specification
         group: Group name or None for main dependencies
-        
+
     Raises:
         TypeError: For PEP 621 projects if arrays/tables aren't the right type
     """
@@ -284,7 +284,7 @@ def _set_dep(doc: TOMLDocument, name: str, spec: str, group: Optional[str]) -> N
         raise ValueError("Dependency name cannot be empty")
     if not spec:
         raise ValueError("Version specification cannot be empty")
-        
+
     layout = _detect_layout(doc)
     if layout == "poetry":
         deps = _get_poetry_dep_table(doc, group)
@@ -315,18 +315,18 @@ def _set_dep(doc: TOMLDocument, name: str, spec: str, group: Optional[str]) -> N
 def _remove_dep(doc: TOMLDocument, name: str, group: Optional[str]) -> bool:
     """
     Remove a dependency. Returns True if removed, False if not found.
-    
+
     Args:
         doc: TOML document to modify
         name: Package name to remove
         group: Group name or None for main dependencies
-        
+
     Returns:
         True if dependency was found and removed, False otherwise
     """
     if not name:
         raise ValueError("Dependency name cannot be empty")
-        
+
     layout = _detect_layout(doc)
     if layout == "poetry":
         # For Poetry, handle both legacy dev-dependencies and new group structure
@@ -336,14 +336,14 @@ def _remove_dep(doc: TOMLDocument, name: str, group: Optional[str]) -> bool:
             if name in legacy_deps:
                 del legacy_deps[name]
                 return True
-                
+
             # Try new group.dev structure
             group_deps = doc.get("tool", {}).get("poetry", {}).get("group", {}).get("dev", {}).get("dependencies", {})
             if name in group_deps:
                 del group_deps[name]
                 return True
             return False
-            
+
         # Regular group or main dependencies
         deps = _get_poetry_dep_table(doc, group)
         if name in deps:
@@ -358,7 +358,7 @@ def _remove_dep(doc: TOMLDocument, name: str, group: Optional[str]) -> bool:
         arrays.append(deps)
     elif group in opt:
         arrays.append(opt.get(group))
-    
+
     removed = False
     for arr in arrays:
         if not isinstance(arr, tomlkit.items.Array):
@@ -382,17 +382,17 @@ def _set_python_constraint(doc: TOMLDocument, spec: str) -> None:
     Set Python constraint:
     - Poetry: [tool.poetry.dependencies].python = "<spec>"
     - PEP 621: [project].requires-python = "<spec>"
-    
+
     Args:
         doc: TOML document to modify
         spec: Python version specification
-        
+
     Raises:
         ValueError: If spec is empty
     """
     if not spec:
         raise ValueError("Python version specification cannot be empty")
-        
+
     layout = _detect_layout(doc)
     if layout == "poetry":
         tool = doc.setdefault("tool", tomlkit.table())
@@ -408,16 +408,16 @@ def _set_python_constraint(doc: TOMLDocument, spec: str) -> None:
 def _write_or_diff(path: Path, old_text: str, new_text: str, check: bool) -> int:
     """
     Write new content to a file or print a diff if check mode is enabled.
-    
+
     Args:
         path: Path to write to
         old_text: Original file content
         new_text: New file content
         check: If True, print diff instead of writing
-        
+
     Returns:
         0 for success
-        
+
     Raises:
         PermissionError: If the file cannot be written due to permissions
         OSError: For other file system related errors
@@ -427,7 +427,7 @@ def _write_or_diff(path: Path, old_text: str, new_text: str, check: bool) -> int
                                     fromfile=str(path), tofile=str(path)))
         sys.stdout.write(diff)
         return 0
-        
+
     try:
         path.write_text(new_text, encoding="utf-8")
     except (PermissionError, OSError) as e:
@@ -439,10 +439,10 @@ def _write_or_diff(path: Path, old_text: str, new_text: str, check: bool) -> int
 def main(argv: Optional[list[str]] = None) -> int:
     """
     Main entry point for the script.
-    
+
     Args:
         argv: Command line arguments (defaults to sys.argv)
-        
+
     Returns:
         Exit code (0 for success, non-zero for failure)
     """
@@ -486,7 +486,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
         elif args.cmd == "set-dep":
             _set_dep(doc, args.name.strip(), args.spec.strip(), args.group)
-            print(f"Set dependency: {args.name} to {args.spec}" + 
+            print(f"Set dependency: {args.name} to {args.spec}" +
                   (f" in group '{args.group}'" if args.group else ""))
 
         elif args.cmd == "remove-dep":
@@ -494,7 +494,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             if not removed:
                 print(f"Dependency '{args.name}' not found.", file=sys.stderr)
                 return 1
-            print(f"Removed dependency: {args.name}" + 
+            print(f"Removed dependency: {args.name}" +
                   (f" from group '{args.group}'" if args.group else ""))
 
         elif args.cmd == "set-python":
@@ -516,7 +516,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             return _write_or_diff(pyproject, before, after, args.check)
 
         return _write_or_diff(pyproject, before, after, args.check)
-        
+
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1

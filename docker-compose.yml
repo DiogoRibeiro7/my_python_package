@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     volumes:
@@ -10,7 +10,7 @@ services:
     command: python -m my_python_package
 
   test:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     volumes:
@@ -18,7 +18,7 @@ services:
     command: pytest
 
   lint:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     volumes:
@@ -26,10 +26,9 @@ services:
     command: ruff check .
 
   type-check:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - .:/opt/pysetup
     command: mypy src tests
-  

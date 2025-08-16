@@ -1,8 +1,8 @@
 # my_python_package
 
-[![PyPI version](https://img.shields.io/pypi/v/my_python_package.svg) ![Docstring Coverage](https://img.shields.io/badge/docstring%20coverage-93.1%25-brightgreen)](https://pypi.org/project/my_python_package/) 
-[![Python Versions](https://img.shields.io/pypi/pyversions/my_python_package.svg)](https://pypi.org/project/my_python_package/) 
-[![Tests](https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml/badge.svg)](https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml) 
+[![PyPI version](https://img.shields.io/pypi/v/my_python_package.svg) ![Docstring Coverage](https://img.shields.io/badge/docstring%20coverage-93.1%25-brightgreen)](https://pypi.org/project/my_python_package/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/my_python_package.svg)](https://pypi.org/project/my_python_package/)
+[![Tests](https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml/badge.svg)](https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml)
 [![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://codecov.io/gh/DiogoRibeiro7/my_python_package)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -80,7 +80,7 @@ print(format_greeting("World"))  # Output: Hello, World!
 
 # Custom formatting
 print(format_greeting(
-    "Python", 
+    "Python",
     greeting="Welcome",
     punctuation="!!!",
     uppercase=True

@@ -11,14 +11,14 @@ Examples:
     >>> from my_python_package import hello
     >>> hello("World")
     'Hello, World!'
-    
+
     >>> from my_python_package import generate_greeting
     >>> import re
     >>> # Time-based greeting will vary by time of day
-    >>> bool(re.match(r'(Good (morning|afternoon|evening)|Hello), World!', 
+    >>> bool(re.match(r'(Good (morning|afternoon|evening)|Hello), World!',
     ...               generate_greeting("World", time_based=True)))
     True
-    
+
     >>> from my_python_package import random_greeting
     >>> # Random greeting will contain the name
     >>> "World" in random_greeting("World")
@@ -41,7 +41,7 @@ __author__: str = "Diogo Ribeiro"
 
 # Public API
 __all__ = [
-    "hello", 
+    "hello",
     "generate_greeting",
     "random_greeting",
     "validate_name",
@@ -53,7 +53,7 @@ __all__ = [
 def _main() -> None:
     """
     Entry point for module execution.
-    
+
     This function is called when the module is run directly
     with `python -m my_python_package`.
     """

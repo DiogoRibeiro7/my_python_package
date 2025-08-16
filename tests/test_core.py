@@ -168,11 +168,11 @@ def test_greeting_chain():
     # Validate the name
     is_valid, _ = validate_name(name)
     assert is_valid
-    
+
     # Generate a basic greeting
     greeting = hello(name)
     assert greeting == "Hello, Test!"
-    
+
     # Format the greeting
     formatted = format_greeting(name, uppercase=True)
     assert formatted == "HELLO, TEST!"

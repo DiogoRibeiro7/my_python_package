@@ -15,7 +15,7 @@ def test_parse_args_hello():
     assert args.command == "hello"
     assert args.name == "World"
     assert args.greeting is None
-    
+
     args = parse_args(["hello", "World", "--greeting", "Hi"])
     assert args.command == "hello"
     assert args.name == "World"
@@ -35,7 +35,7 @@ def test_parse_args_time():
     assert args.command == "time"
     assert args.name == "World"
     assert not args.formal
-    
+
     args = parse_args(["time", "World", "--formal"])
     assert args.command == "time"
     assert args.name == "World"
@@ -51,7 +51,7 @@ def test_parse_args_format():
     assert args.punctuation == "!"
     assert not args.uppercase
     assert args.max_length is None
-    
+
     args = parse_args([
         "format", "World",
         "--greeting", "Hi",
@@ -73,7 +73,7 @@ def test_parse_args_multi():
     assert args.command == "multi"
     assert args.names == ["Alice", "Bob"]
     assert args.greeting == "Hello"
-    
+
     args = parse_args(["multi", "Alice", "Bob", "--greeting", "Hi"])
     assert args.command == "multi"
     assert args.names == ["Alice", "Bob"]

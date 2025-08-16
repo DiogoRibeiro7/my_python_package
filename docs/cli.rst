@@ -80,8 +80,8 @@ Format a greeting with various options:
 
 .. code-block:: bash
 
-    my-python-package format NAME 
-                       [--greeting GREETING] 
+    my-python-package format NAME
+                       [--greeting GREETING]
                        [--punctuation PUNCTUATION]
                        [--uppercase]
                        [--max-length MAX_LENGTH]
@@ -208,16 +208,16 @@ You can use the CLI in shell scripts:
 .. code-block:: bash
 
     #!/bin/bash
-    
+
     # Greet all users in a file
     while read name; do
         my-python-package hello "$name" --greeting "Welcome"
     done < users.txt
-    
+
     # Save and load configuration
     my-python-package config set --greeting "Hi" --punctuation "!"
     my-python-package config save my_config.json
-    
+
     # Later, restore the configuration
     my-python-package config load my_config.json
 
@@ -230,7 +230,7 @@ You can redirect the output to files:
 
     # Save greetings to a file
     my-python-package multi Alice Bob Charlie > greetings.txt
-    
+
     # Append more greetings
     my-python-package hello Dave >> greetings.txt
 

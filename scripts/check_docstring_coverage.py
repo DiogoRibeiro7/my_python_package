@@ -215,7 +215,7 @@ def check_directory_docstrings(
         stats.setdefault(item.type, {})
         stats[item.type].setdefault("total", 0)
         stats[item.type].setdefault("with_docstring", 0)
-        
+
         stats[item.type]["total"] += 1
         if item.has_docstring:
             stats[item.type]["with_docstring"] += 1
@@ -224,14 +224,14 @@ def check_directory_docstrings(
     percentages: Dict[str, float] = {}
     total_items = 0
     total_with_docs = 0
-    
+
     for item_type, counts in stats.items():
         if counts.get("total", 0) > 0:
             percentage = (counts.get("with_docstring", 0) / counts["total"]) * 100
             percentages[item_type] = percentage
             total_items += counts["total"]
             total_with_docs += counts.get("with_docstring", 0)
-    
+
     if total_items > 0:
         percentages["overall"] = (total_with_docs / total_items) * 100
     else:
@@ -276,7 +276,7 @@ def print_report(
     for item_type, percentage in sorted(stats.items()):
         if item_type != "overall":
             print(f"{item_type.capitalize()}: {percentage:.1f}%")
-    
+
     # Print overall percentage
     print("\n" + "=" * 80)
     print(f"Overall docstring coverage: {stats.get('overall', 0):.1f}%")

@@ -35,7 +35,7 @@ For more control over the output, use ``format_greeting()``:
 
     # Custom formatting
     print(format_greeting(
-        "Python", 
+        "Python",
         greeting="Welcome",
         punctuation="!!!",
         uppercase=True
@@ -166,10 +166,10 @@ You can combine multiple features for more complex behavior:
         is_valid, error = validate_name(name)
         if not is_valid:
             return f"Cannot greet: {error}"
-        
+
         # Choose appropriate greeting
         greeting = "Dear" if formal else "Hi"
-        
+
         # Format the greeting
         return format_greeting(
             name,
@@ -198,12 +198,12 @@ For more advanced use cases, you can create a custom greeting system:
         def __init__(self, default_greeting="Hello"):
             self.default_greeting = default_greeting
             self.greetings_history = {}
-        
+
         def greet(self, name, greeting_type="standard"):
             # Track greetings per user
             if name not in self.greetings_history:
                 self.greetings_history[name] = []
-            
+
             # Generate greeting based on type
             if greeting_type == "standard":
                 result = format_greeting(name, greeting=self.default_greeting)
@@ -215,15 +215,15 @@ For more advanced use cases, you can create a custom greeting system:
                 result = generate_greeting(name, formal=True)
             else:
                 result = format_greeting(name, greeting=greeting_type)
-            
+
             # Record this greeting
             self.greetings_history[name].append(result)
-            
+
             return result
-        
+
         def get_greeting_history(self, name):
             return self.greetings_history.get(name, [])
-    
+
     # Example usage
     greeter = GreetingSystem()
     print(greeter.greet("Alice"))  # Standard: Hello, Alice!
@@ -231,6 +231,6 @@ For more advanced use cases, you can create a custom greeting system:
     print(greeter.greet("Alice", "time"))  # Time-based greeting
     print(greeter.greet("Bob", "formal"))  # Formal: Good day, Mr./Ms. Bob!
     print(greeter.greet("Bob", "Welcome"))  # Custom: Welcome, Bob!
-    
+
     # Get history for a user
     print(greeter.get_greeting_history("Alice"))  # List of all greetings for Alice

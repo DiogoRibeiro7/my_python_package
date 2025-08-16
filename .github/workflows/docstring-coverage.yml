@@ -10,42 +10,42 @@ on:
 jobs:
   docstring-coverage:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          
+
       - name: Check docstring coverage
         run: |
           python scripts/check_docstring_coverage.py --min-coverage 80
-          
+
       - name: Generate docstring coverage badge
         run: |
           python -c "
           import re
           import subprocess
           import json
-          
+
           # Run the docstring coverage script and capture output
           result = subprocess.run(
               ['python', 'scripts/check_docstring_coverage.py', '--dir', 'src'],
               capture_output=True,
               text=True
           )
-          
+
           # Extract the overall coverage percentage
           match = re.search(r'Overall docstring coverage: (\d+\.\d+)%', result.stdout)
           if match:
               coverage = float(match.group(1))
-              
+
               # Determine badge color
               color = 'red'
               if coverage >= 90:
@@ -58,14 +58,14 @@ jobs:
                   color = 'yellow'
               elif coverage >= 50:
                   color = 'orange'
-                  
+
               # Create badge URL
               badge_url = f'https://img.shields.io/badge/docstring%20coverage-{coverage:.1f}%25-{color}'
-              
+
               # Update README.md
               with open('README.md', 'r') as f:
                   readme = f.read()
-                  
+
               # Look for existing docstring coverage badge
               docstring_badge_pattern = r'!\[Docstring Coverage\]\(https://img\.shields\.io/badge/docstring%20coverage-[\d\.]+%25-[a-z]+\)'
               if re.search(docstring_badge_pattern, readme):
@@ -85,15 +85,15 @@ jobs:
                           readme = readme[:first_line_end+1] + f'\\n![Docstring Coverage]({badge_url})\\n' + readme[first_line_end+1:]
                       else:
                           readme = readme + f'\\n\\n![Docstring Coverage]({badge_url})\\n'
-              
+
               with open('README.md', 'w') as f:
                   f.write(readme)
-              
+
               print(f'Updated README.md with docstring coverage badge: {coverage:.1f}%')
           else:
               print('Could not extract docstring coverage percentage')
           "
-          
+
       - name: Commit updated README with docstring coverage badge
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
@@ -104,6 +104,6 @@ jobs:
             git commit -m "docs: update docstring coverage badge [skip ci]"
             git push
           )
-        
+
 permissions:
   contents: write
