@@ -1,4 +1,4 @@
-from my_python_package import hello
+from greeting_toolkit import hello
 
 
 def main():

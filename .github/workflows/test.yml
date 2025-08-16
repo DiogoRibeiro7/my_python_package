@@ -34,7 +34,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          poetry run pytest --cov=my_python_package --cov-report=xml
+          poetry run pytest --cov=greeting_toolkit --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""
-Check docstring coverage in the project.
+"""Check docstring coverage in the project.
 
 This script inspects Python modules, classes, and functions to ensure
 they have proper docstrings. It reports items that are missing docstrings
@@ -36,8 +35,7 @@ class DocItem(NamedTuple):
 
 
 def is_public(name: str) -> bool:
-    """
-    Check if a name is public (not starting with underscore).
+    """Check if a name is public (not starting with underscore).
 
     Args:
         name: The name to check
@@ -51,8 +49,7 @@ def is_public(name: str) -> bool:
 
 
 def should_have_docstring(node: ast.AST, include_all: bool = False) -> bool:
-    """
-    Determine if a node should have a docstring based on our standards.
+    """Determine if a node should have a docstring based on our standards.
 
     Args:
         node: The AST node to check
@@ -81,35 +78,33 @@ def should_have_docstring(node: ast.AST, include_all: bool = False) -> bool:
     return False
 
 
-def get_docstring(node: ast.AST) -> Optional[str]:
-    """
-    Extract docstring from an AST node.
+def get_docstring(node: ast.AST) -> str | None:
+    """Extract docstring from an AST node.
 
     Args:
         node: The AST node to extract docstring from
 
     Returns:
-        The docstring if present, None otherwise
+        The docstring if present, ``None`` otherwise
     """
     try:
         if not node.body:
             return None
         first_node = node.body[0]
-        if isinstance(first_node, ast.Expr) and isinstance(first_node.value, ast.Str):
         if isinstance(first_node, ast.Expr):
-            if (
-                isinstance(first_node.value, ast.Str)
-                or (isinstance(first_node.value, ast.Constant) and isinstance(first_node.value.value, str))
+            if isinstance(first_node.value, ast.Str):
+                return first_node.value.s
+            if isinstance(first_node.value, ast.Constant) and isinstance(
+                first_node.value.value, str
             ):
-                return first_node.value.s if hasattr(first_node.value, "s") else first_node.value.value
+                return first_node.value.value
         return None
     except (AttributeError, IndexError):
         return None
 
 
-def check_file_docstrings(file_path: Path, include_all: bool = False) -> List[DocItem]:
-    """
-    Check docstring coverage for a Python file.
+def check_file_docstrings(file_path: Path, include_all: bool = False) -> list[DocItem]:
+    """Check docstring coverage for a Python file.
 
     Args:
         file_path: Path to the Python file
@@ -118,14 +113,14 @@ def check_file_docstrings(file_path: Path, include_all: bool = False) -> List[Do
     Returns:
         List of DocItem instances for each item that should have a docstring
     """
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         try:
             tree = ast.parse(f.read(), filename=str(file_path))
         except SyntaxError:
             print(f"Syntax error in {file_path}")
             return []
 
-    results: List[DocItem] = []
+    results: list[DocItem] = []
 
     # Check module docstring
     module_has_doc = bool(get_docstring(tree))
@@ -176,10 +171,9 @@ def check_file_docstrings(file_path: Path, include_all: bool = False) -> List[Do
 
 
 def check_directory_docstrings(
-    directory: Path, include_all: bool = False, exclude: Optional[Set[str]] = None
-) -> Tuple[List[DocItem], Dict[str, float]]:
-    """
-    Check docstring coverage for all Python files in a directory.
+    directory: Path, include_all: bool = False, exclude: set[str] | None = None
+) -> tuple[list[DocItem], dict[str, float]]:
+    """Check docstring coverage for all Python files in a directory.
 
     Args:
         directory: Directory to check
@@ -203,7 +197,7 @@ def check_directory_docstrings(
             ".ruff_cache",
         }
 
-    all_results: List[DocItem] = []
+    all_results: list[DocItem] = []
     for root, dirs, files in os.walk(directory):
         # Skip excluded directories
         dirs[:] = [d for d in dirs if d not in exclude]
@@ -215,7 +209,7 @@ def check_directory_docstrings(
                 all_results.extend(results)
 
     # Calculate statistics
-    stats: Dict[str, Dict[str, int]] = {"module": {}, "class": {}, "function": {}, "method": {}}
+    stats: dict[str, dict[str, int]] = {"module": {}, "class": {}, "function": {}, "method": {}}
     for item in all_results:
         stats.setdefault(item.type, {})
         stats[item.type].setdefault("total", 0)
@@ -226,7 +220,7 @@ def check_directory_docstrings(
             stats[item.type]["with_docstring"] += 1
 
     # Calculate percentages
-    percentages: Dict[str, float] = {}
+    percentages: dict[str, float] = {}
     total_items = 0
     total_with_docs = 0
 
@@ -246,10 +240,9 @@ def check_directory_docstrings(
 
 
 def print_report(
-    items: List[DocItem], stats: Dict[str, float], show_documented: bool = False
+    items: list[DocItem], stats: dict[str, float], show_documented: bool = False
 ) -> None:
-    """
-    Print a docstring coverage report.
+    """Print a docstring coverage report.
 
     Args:
         items: List of DocItem instances
@@ -291,9 +284,7 @@ def print_report(
 def main():
     """Run the docstring coverage check."""
     parser = ArgumentParser(description="Check docstring coverage")
-    parser.add_argument(
-        "--dir", type=str, default="src", help="Directory to check (default: src)"
-    )
+    parser.add_argument("--dir", type=str, default="src", help="Directory to check (default: src)")
     parser.add_argument(
         "--include-all",
         action="store_true",

@@ -2,7 +2,7 @@
 Development Guide
 =================
 
-This guide will help you set up your development environment and understand the workflow for contributing to ``my_python_package``.
+This guide will help you set up your development environment and understand the workflow for contributing to ``greeting_toolkit``.
 
 Development Environment Setup
 ---------------------------
@@ -21,8 +21,8 @@ Initial Setup
 
    .. code-block:: bash
 
-       git clone https://github.com/DiogoRibeiro7/my_python_package.git
-       cd my_python_package
+       git clone https://github.com/DiogoRibeiro7/greeting-toolkit.git
+       cd greeting-toolkit
 
 2. Install dependencies and set up pre-commit hooks:
 
@@ -143,7 +143,7 @@ Project Structure
 
 .. code-block:: text
 
-    my_python_package/
+    greeting_toolkit/
     ├── pyproject.toml            # Project metadata, dependencies
     ├── setup.cfg                 # Configuration for various tools
     ├── tox.ini                   # Multi-environment testing
@@ -151,7 +151,7 @@ Project Structure
     ├── .editorconfig             # Editor configuration
     ├── Makefile                  # Common development tasks
     ├── src/
-    │   └── my_python_package/    # Package source code
+    │   └── greeting_toolkit/    # Package source code
     │       ├── __init__.py       # Package exports
     │       ├── __main__.py       # Module execution entry point
     │       ├── core.py           # Core greeting functionality
@@ -284,7 +284,7 @@ To run tests with coverage and see which lines are not covered:
 
 .. code-block:: bash
 
-    pytest --cov=my_python_package --cov-report=term-missing
+    pytest --cov=greeting_toolkit --cov-report=term-missing
 
 Debugging Tips
 ~~~~~~~~~~~~

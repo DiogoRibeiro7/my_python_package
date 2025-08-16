@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/opt/pysetup
-    command: python -m my_python_package
+    command: python -m greeting_toolkit
 
   test:
     build:

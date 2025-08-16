@@ -24,7 +24,7 @@ How would users interact with this feature? If applicable, provide example code 
 
 ```python
 # Example code demonstrating how the feature would be used
-from my_python_package import new_feature
+from greeting_toolkit import new_feature
 
 new_feature.do_something()
 ```

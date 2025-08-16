@@ -1,23 +1,23 @@
 ===========================
-my_python_package
+greeting-toolkit
 ===========================
 
 A minimal but production-ready Python package scaffold configured for publishing to PyPI.
 
-.. image:: https://img.shields.io/pypi/v/my_python_package.svg
-   :target: https://pypi.org/project/my_python_package/
+.. image:: https://img.shields.io/pypi/v/greeting-toolkit.svg
+   :target: https://pypi.org/project/greeting-toolkit/
    :alt: PyPI version
 
-.. image:: https://img.shields.io/pypi/pyversions/my_python_package.svg
-   :target: https://pypi.org/project/my_python_package/
+.. image:: https://img.shields.io/pypi/pyversions/greeting-toolkit.svg
+   :target: https://pypi.org/project/greeting-toolkit/
    :alt: Python Versions
 
-.. image:: https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml/badge.svg
-   :target: https://github.com/DiogoRibeiro7/my_python_package/actions/workflows/test.yml
+.. image:: https://github.com/DiogoRibeiro7/greeting-toolkit/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/DiogoRibeiro7/greeting-toolkit/actions/workflows/test.yml
    :alt: Tests
 
 .. image:: https://img.shields.io/badge/coverage-95%25-brightgreen
-   :target: https://codecov.io/gh/DiogoRibeiro7/my_python_package
+   :target: https://codecov.io/gh/DiogoRibeiro7/greeting-toolkit
    :alt: Coverage
 
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -49,7 +49,7 @@ It provides various greeting functions with configurable options for formatting,
 
 .. code-block:: python
 
-    from my_python_package import hello
+    from greeting_toolkit import hello
 
     # Basic usage
     greeting = hello("World")

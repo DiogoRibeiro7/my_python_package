@@ -1,13 +1,12 @@
 #!/usr/bin/env python
-"""
-check_imports_vs_pyproject.py
+"""check_imports_vs_pyproject.py
 
 Scan Python sources for imports, compare to pyproject.toml, and optionally FIX:
 - Adds missing dependencies to the chosen group with a selectable spec strategy.
 - Preserves formatting/comments using tomlkit.
 - Supports Poetry ([tool.poetry]) and PEP 621 ([project]).
 
-Examples
+Examples:
 --------
 # Detect only (text)
 python scripts/check_imports_vs_pyproject.py
@@ -37,29 +36,31 @@ import json
 import sys
 import urllib.error
 import urllib.request
+from collections.abc import Iterable
 from dataclasses import dataclass
 from difflib import unified_diff
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
+from urllib.parse import urlparse
 
 import tomlkit
 from packaging.requirements import Requirement
-from packaging.version import Version, InvalidVersion
+from packaging.version import InvalidVersion, Version
 
 # --- Optional helpers for stdlib / env mapping ---
 try:
-    _STDLIB: Set[str] = set(sys.stdlib_module_names)  # py>=3.10
+    _STDLIB: set[str] = set(sys.stdlib_module_names)  # py>=3.10
 except Exception:
     _STDLIB = set()
 
 try:
     from importlib.metadata import packages_distributions
 
-    _MODULE_TO_DISTS: Dict[str, List[str]] = packages_distributions()
+    _MODULE_TO_DISTS: dict[str, list[str]] = packages_distributions()
 except Exception:
     _MODULE_TO_DISTS = {}
 
-_COMMON_MODULE_TO_DIST: Dict[str, str] = {
+_COMMON_MODULE_TO_DIST: dict[str, str] = {
     "bs4": "beautifulsoup4",
     "cv2": "opencv-python",
     "PIL": "Pillow",
@@ -81,13 +82,13 @@ _COMMON_MODULE_TO_DIST: Dict[str, str] = {
 class Config:
     root: Path
     pyproject: Path
-    groups: List[str]  # Which groups count as "declared" when checking
+    groups: list[str]  # Which groups count as "declared" when checking
     include_optional: bool
     fail_on: str  # missing|unused|both|none
     fmt: str  # text|json
-    exclude_dirs: List[str]
+    exclude_dirs: list[str]
     use_env_map: bool
-    src_hints: List[str]
+    src_hints: list[str]
     # Fix-related:
     fix: bool
     fix_to: str  # main|dev|<group>
@@ -100,11 +101,11 @@ class Config:
 
 @dataclass
 class Report:
-    missing: Dict[str, Set[str]]  # dist -> {modules}
-    unused: Set[str]
-    ambiguous: Dict[str, Set[str]]
-    used_dists: Set[str]
-    declared_dists: Set[str]
+    missing: dict[str, set[str]]  # dist -> {modules}
+    unused: set[str]
+    ambiguous: dict[str, set[str]]
+    used_dists: set[str]
+    declared_dists: set[str]
 
 
 # ---------------- Utilities ----------------
@@ -118,7 +119,7 @@ def is_stdlib(top: str) -> bool:
     return top in _STDLIB
 
 
-def iter_py_files(root: Path, exclude_dirs: List[str]) -> Iterable[Path]:
+def iter_py_files(root: Path, exclude_dirs: list[str]) -> Iterable[Path]:
     default = {
         ".git",
         ".hg",
@@ -141,13 +142,13 @@ def iter_py_files(root: Path, exclude_dirs: List[str]) -> Iterable[Path]:
         yield p
 
 
-def parse_imports(pyfile: Path) -> Set[str]:
+def parse_imports(pyfile: Path) -> set[str]:
     text = pyfile.read_text(encoding="utf-8", errors="ignore")
     try:
         tree = ast.parse(text, filename=str(pyfile))
     except SyntaxError:
         return set()
-    tops: Set[str] = set()
+    tops: set[str] = set()
     for n in ast.walk(tree):
         if isinstance(n, ast.Import):
             for a in n.names:
@@ -161,8 +162,8 @@ def parse_imports(pyfile: Path) -> Set[str]:
     return tops
 
 
-def discover_local_tops(root: Path, hints: List[str]) -> Set[str]:
-    locals_: Set[str] = set()
+def discover_local_tops(root: Path, hints: list[str]) -> set[str]:
+    locals_: set[str] = set()
 
     def scan(base: Path) -> None:
         if not base.exists() or not base.is_dir():
@@ -181,7 +182,7 @@ def discover_local_tops(root: Path, hints: List[str]) -> Set[str]:
     return locals_
 
 
-def map_module_to_dists(mod: str, use_env: bool = True) -> List[str]:
+def map_module_to_dists(mod: str, use_env: bool = True) -> list[str]:
     if use_env and _MODULE_TO_DISTS:
         d = _MODULE_TO_DISTS.get(mod, [])
         if d:
@@ -194,11 +195,12 @@ def map_module_to_dists(mod: str, use_env: bool = True) -> List[str]:
 # ------------- PyPI lookup + strategy -------------
 
 
-def fetch_latest(
-    name: str, timeout: float, include_prerelease: bool
-) -> Optional[Version]:
+def fetch_latest(name: str, timeout: float, include_prerelease: bool) -> Version | None:
     url = f"https://pypi.org/pypi/{pep503(name)}/json"
     try:
+        parsed = urlparse(url)
+        if parsed.scheme not in {"http", "https"}:
+            raise ValueError(f"Unsupported URL scheme: {parsed.scheme}")
         with urllib.request.urlopen(url, timeout=timeout) as r:
             data = json.loads(r.read().decode("utf-8"))
     except (
@@ -209,7 +211,7 @@ def fetch_latest(
     ):
         return None
     releases = data.get("releases", {}) or {}
-    best: Optional[Version] = None
+    best: Version | None = None
     for vstr, files in releases.items():
         if not files:
             continue
@@ -255,7 +257,7 @@ def poetry_spec_for(v: Version, strategy: str) -> str:
 # ------------- Read/Write pyproject (tomlkit) -------------
 
 
-def load_doc(path: Path) -> Tuple[str, tomlkit.TOMLDocument]:
+def load_doc(path: Path) -> tuple[str, tomlkit.TOMLDocument]:
     text = path.read_text(encoding="utf-8")
     return text, tomlkit.parse(text)
 
@@ -269,16 +271,14 @@ def layout(doc: tomlkit.TOMLDocument) -> str:
         return "poetry"
     if "project" in doc:
         return "pep621"
-    raise ValueError(
-        "Unsupported pyproject: neither [tool.poetry] nor [project] found."
-    )
+    raise ValueError("Unsupported pyproject: neither [tool.poetry] nor [project] found.")
 
 
 def collect_declared(
-    doc: tomlkit.TOMLDocument, groups: List[str], include_optional: bool
-) -> Set[str]:
+    doc: tomlkit.TOMLDocument, groups: list[str], include_optional: bool
+) -> set[str]:
     wanted = set(groups)
-    dec: Set[str] = set()
+    dec: set[str] = set()
 
     # Poetry
     tool = doc.get("tool", {})
@@ -325,11 +325,8 @@ def collect_declared(
     return dec
 
 
-def add_dep_to_doc(
-    doc: tomlkit.TOMLDocument, dist: str, spec: str, fix_to: str
-) -> None:
-    """
-    Add dependency to doc in the selected group.
+def add_dep_to_doc(doc: tomlkit.TOMLDocument, dist: str, spec: str, fix_to: str) -> None:
+    """Add dependency to doc in the selected group.
     - Poetry: under [tool.poetry.dependencies] or group.<g>.dependencies
     - PEP 621: in project.dependencies (main) or optional-dependencies.<g>
     """
@@ -387,14 +384,14 @@ def analyze(cfg: Config) -> Report:
     declared = collect_declared(doc, cfg.groups, cfg.include_optional)
 
     local = discover_local_tops(cfg.root, cfg.src_hints)
-    imported: Set[str] = set()
+    imported: set[str] = set()
     for f in iter_py_files(cfg.root, cfg.exclude_dirs):
         imported |= parse_imports(f)
 
     third_party = {m for m in imported if not is_stdlib(m) and m not in local}
 
-    used_dists: Set[str] = set()
-    ambiguous: Dict[str, Set[str]] = {}
+    used_dists: set[str] = set()
+    ambiguous: dict[str, set[str]] = {}
     for mod in sorted(third_party):
         dists = map_module_to_dists(mod, cfg.use_env_map)
         if len(dists) == 1:
@@ -406,7 +403,7 @@ def analyze(cfg: Config) -> Report:
                 if d in declared:
                     used_dists.add(d)
 
-    missing: Dict[str, Set[str]] = {}
+    missing: dict[str, set[str]] = {}
     for mod in sorted(third_party):
         dists = map_module_to_dists(mod, cfg.use_env_map)
         if any(d in declared for d in dists):
@@ -418,8 +415,7 @@ def analyze(cfg: Config) -> Report:
 
 
 def apply_fix(cfg: Config, rep: Report) -> int:
-    """
-    Add missing distributions to pyproject.toml using selected strategy.
+    """Add missing distributions to pyproject.toml using selected strategy.
     Returns 0 (write/diff success) or raises on errors.
     """
     if not rep.missing:
@@ -454,7 +450,7 @@ def apply_fix(cfg: Config, rep: Report) -> int:
 # ------------- CLI -------------
 
 
-def parse_args(argv: Optional[List[str]] = None) -> Config:
+def parse_args(argv: list[str] | None = None) -> Config:
     p = argparse.ArgumentParser(
         description="Check (and optionally fix) imports vs pyproject dependencies."
     )
@@ -500,9 +496,7 @@ def parse_args(argv: Optional[List[str]] = None) -> Config:
     )
 
     # Fix options
-    p.add_argument(
-        "--fix", action="store_true", help="Write missing deps into pyproject.toml."
-    )
+    p.add_argument("--fix", action="store_true", help="Write missing deps into pyproject.toml.")
     p.add_argument(
         "--fix-to",
         default="main",
@@ -537,9 +531,7 @@ def parse_args(argv: Optional[List[str]] = None) -> Config:
         action="store_true",
         help="Dry-run: print unified diff; do not write.",
     )
-    p.add_argument(
-        "--timeout", type=float, default=8.0, help="HTTP timeout for PyPI lookups."
-    )
+    p.add_argument("--timeout", type=float, default=8.0, help="HTTP timeout for PyPI lookups.")
 
     a = p.parse_args(argv)
     groups = [g.strip() for g in a.groups.split(",") if g.strip()]
@@ -566,7 +558,7 @@ def parse_args(argv: Optional[List[str]] = None) -> Config:
 
 
 def format_report_text(r: Report) -> str:
-    lines: List[str] = []
+    lines: list[str] = []
     if r.missing:
         lines.append("MISSING (imported but not declared):")
         for dist, modules in sorted(r.missing.items()):
@@ -600,7 +592,7 @@ def format_report_json(r: Report) -> str:
     return json.dumps(obj, indent=2, sort_keys=True)
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     cfg = parse_args(argv)
     rep = analyze(cfg)
 
