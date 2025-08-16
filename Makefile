@@ -46,7 +46,7 @@ test:
 	poetry run pytest
 
 test-cov:
-	poetry run pytest --cov=my_python_package --cov-report=term-missing
+	poetry run pytest --cov=greeting_toolkit --cov-report=term-missing
 
 tox:
 	poetry run tox

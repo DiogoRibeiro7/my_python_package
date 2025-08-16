@@ -1,4 +1,4 @@
-// Custom JavaScript for my_python_package documentation
+// Custom JavaScript for greeting_toolkit documentation
 
 document.addEventListener('DOMContentLoaded', function() {
     // Add copy buttons to code blocks

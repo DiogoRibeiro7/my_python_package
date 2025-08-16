@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from my_python_package.config import Config, DEFAULT_CONFIG
+from greeting_toolkit.config import DEFAULT_CONFIG, Config
 
 
 def test_config_defaults():
@@ -123,7 +123,7 @@ def test_config_load_from_env():
 
     try:
         # Set environment variable
-        with patch.dict(os.environ, {"MY_PYTHON_PACKAGE_CONFIG": tmp.name}):
+        with patch.dict(os.environ, {"GREETING_TOOLKIT_CONFIG": tmp.name}):
             config = Config()  # No path provided, should use env var
 
             # Check custom values were loaded
@@ -177,7 +177,7 @@ def test_config_save():
         assert config_path.exists()
 
         # Load and verify
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             saved_config = json.load(f)
 
         assert saved_config["default_greeting"] == "Hola"
@@ -201,7 +201,7 @@ def test_config_save_to_current_path():
         assert config_path.exists()
 
         # Verify content
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             saved_config = json.load(f)
 
         assert saved_config["default_greeting"] == "Bonjour"

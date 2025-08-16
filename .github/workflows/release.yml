@@ -205,8 +205,8 @@ jobs:
 
               # Update the links at the bottom
               if grep -q "\[unreleased\]:" CHANGELOG.md; then
-                sed -i "s|\[unreleased\]:.*|[unreleased]: https://github.com/DiogoRibeiro7/my_python_package/compare/v${{ steps.extract_version.outputs.version }}...HEAD|" CHANGELOG.md
-                sed -i "/\[unreleased\]:/a [{{ steps.extract_version.outputs.version }}]: https://github.com/DiogoRibeiro7/my_python_package/compare/v$(git describe --tags --abbrev=0 ${{ github.ref_name }}^)...v${{ steps.extract_version.outputs.version }}" CHANGELOG.md
+                sed -i "s|\[unreleased\]:.*|[unreleased]: https://github.com/DiogoRibeiro7/greeting-toolkit/compare/v${{ steps.extract_version.outputs.version }}...HEAD|" CHANGELOG.md
+                sed -i "/\[unreleased\]:/a [{{ steps.extract_version.outputs.version }}]: https://github.com/DiogoRibeiro7/greeting-toolkit/compare/v$(git describe --tags --abbrev=0 ${{ github.ref_name }}^)...v${{ steps.extract_version.outputs.version }}" CHANGELOG.md
               fi
             fi
           fi
@@ -215,4 +215,4 @@ jobs:
         if: success()
         run: |
           echo "✅ Package v${{ steps.extract_version.outputs.version }} has been released to PyPI!"
-          echo "📦 https://pypi.org/project/my-python-package/${{ steps.extract_version.outputs.version }}/"
+          echo "📦 https://pypi.org/project/greeting-toolkit/${{ steps.extract_version.outputs.version }}/"

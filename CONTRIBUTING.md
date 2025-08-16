@@ -1,6 +1,8 @@
-# Contributing to my_python_package
+# Contributing to greeting-toolkit
 
-Thank you for considering contributing to my_python_package! This document provides guidelines and instructions for contributing.
+Thank you for considering contributing to greeting-toolkit! This document provides guidelines and instructions for contributing.
+
+> **Migration note:** The project was renamed from `my_python_package` to `greeting-toolkit`. Update imports to `greeting_toolkit` and CLI usage to `greeting-toolkit`.
 
 ## Code of Conduct
 
@@ -43,8 +45,8 @@ For feature requests, please use the feature request template. Include:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/DiogoRibeiro7/my_python_package.git
-   cd my_python_package
+   git clone https://github.com/DiogoRibeiro7/greeting-toolkit.git
+   cd greeting-toolkit
    ```
 
 2. Set up the development environment:

@@ -1,17 +1,24 @@
-"""Configuration module for my_python_package."""
+"""Configuration module for greeting_toolkit."""
 
 import json
 import os
+from contextlib import suppress
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, cast
 
 # Default configuration
-DEFAULT_CONFIG: Dict[str, Any] = {
+DEFAULT_CONFIG: dict[str, Any] = {
     "default_greeting": "Hello",
     "default_punctuation": "!",
     "available_greetings": [
-        "Hello", "Hi", "Hey", "Greetings", "Hey there",
-        "Howdy", "Welcome", "Good to see you"
+        "Hello",
+        "Hi",
+        "Hey",
+        "Greetings",
+        "Hey there",
+        "Howdy",
+        "Welcome",
+        "Good to see you",
     ],
     "max_name_length": 50,
     "formal_title": "Mr./Ms. ",
@@ -19,8 +26,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
 
 
 class Config:
-    """
-    Configuration handler for my_python_package.
+    """Configuration handler for greeting_toolkit.
 
     Manages package configuration with defaults and optional loading from file.
     Configuration can be saved to and loaded from JSON files.
@@ -44,9 +50,8 @@ class Config:
         True
     """
 
-    def __init__(self, config_path: Optional[Path] = None) -> None:
-        """
-        Initialize configuration.
+    def __init__(self, config_path: Path | None = None) -> None:
+        """Initialize configuration.
 
         Args:
             config_path: Path to custom config file
@@ -70,39 +75,35 @@ class Config:
             >>> import os
             >>> os.unlink(tmp_path)
         """
-        self._config: Dict[str, Any] = DEFAULT_CONFIG.copy()
-        self._config_path: Optional[Path] = config_path
+        self._config: dict[str, Any] = DEFAULT_CONFIG.copy()
+        self._config_path: Path | None = config_path
         self._load_config()
 
     def _load_config(self) -> None:
-        """
-        Load configuration from file if exists.
+        """Load configuration from file if exists.
 
         Checks for a configuration file path either from initialization or
-        from the MY_PYTHON_PACKAGE_CONFIG environment variable. If a valid
+        from the GREETING_TOOLKIT_CONFIG environment variable. If a valid
         JSON file is found, its values are merged with the defaults.
         """
         # Check environment variable first
-        env_config = os.environ.get("MY_PYTHON_PACKAGE_CONFIG")
+        env_config = os.environ.get("GREETING_TOOLKIT_CONFIG")
         if env_config:
-            try:
+            with suppress(Exception):
                 self._config_path = Path(env_config)
-            except Exception:
-                pass
 
         # Try loading from file
         if self._config_path and self._config_path.exists():
             try:
-                with open(self._config_path, "r") as f:
+                with open(self._config_path) as f:
                     user_config = json.load(f)
                     self._config.update(user_config)
-            except (json.JSONDecodeError, IOError, OSError):
+            except (json.JSONDecodeError, OSError):
                 # Fall back to defaults on error
                 pass
 
-    def save_config(self, path: Optional[Path] = None) -> None:
-        """
-        Save current configuration to file.
+    def save_config(self, path: Path | None = None) -> None:
+        """Save current configuration to file.
 
         Args:
             path: Path to save config (defaults to current config path)
@@ -132,15 +133,14 @@ class Config:
             ...     saved_data["default_greeting"] == "Bonjour"
             True
         """
-        save_path: Optional[Path] = path or self._config_path
+        save_path: Path | None = path or self._config_path
         if save_path:
             with open(save_path, "w") as f:
                 json.dump(self._config, f, indent=2)
 
     @property
     def default_greeting(self) -> str:
-        """
-        Get default greeting.
+        """Get default greeting.
 
         Returns:
             The configured default greeting
@@ -154,8 +154,7 @@ class Config:
 
     @default_greeting.setter
     def default_greeting(self, value: str) -> None:
-        """
-        Set default greeting.
+        """Set default greeting.
 
         Args:
             value: New default greeting
@@ -173,8 +172,7 @@ class Config:
 
     @property
     def default_punctuation(self) -> str:
-        """
-        Get default punctuation.
+        """Get default punctuation.
 
         Returns:
             The configured default punctuation
@@ -188,8 +186,7 @@ class Config:
 
     @default_punctuation.setter
     def default_punctuation(self, value: str) -> None:
-        """
-        Set default punctuation.
+        """Set default punctuation.
 
         Args:
             value: New default punctuation
@@ -206,9 +203,8 @@ class Config:
         self._config["default_punctuation"] = value
 
     @property
-    def available_greetings(self) -> List[str]:
-        """
-        Get available greetings for random selection.
+    def available_greetings(self) -> list[str]:
+        """Get available greetings for random selection.
 
         Returns:
             List of greeting strings
@@ -223,12 +219,11 @@ class Config:
             >>> all(isinstance(g, str) for g in greetings)
             True
         """
-        return cast(List[str], self._config["available_greetings"])
+        return cast(list[str], self._config["available_greetings"])
 
     @available_greetings.setter
-    def available_greetings(self, value: List[str]) -> None:
-        """
-        Set available greetings.
+    def available_greetings(self, value: list[str]) -> None:
+        """Set available greetings.
 
         Args:
             value: List of greeting strings
@@ -258,8 +253,7 @@ class Config:
 
     @property
     def max_name_length(self) -> int:
-        """
-        Get maximum name length.
+        """Get maximum name length.
 
         Returns:
             Maximum allowed length for names
@@ -275,8 +269,7 @@ class Config:
 
     @max_name_length.setter
     def max_name_length(self, value: int) -> None:
-        """
-        Set maximum name length.
+        """Set maximum name length.
 
         Args:
             value: New maximum length
@@ -309,8 +302,7 @@ class Config:
 
     @property
     def formal_title(self) -> str:
-        """
-        Get formal title prefix.
+        """Get formal title prefix.
 
         Returns:
             The configured formal title prefix
@@ -324,8 +316,7 @@ class Config:
 
     @formal_title.setter
     def formal_title(self, value: str) -> None:
-        """
-        Set formal title prefix.
+        """Set formal title prefix.
 
         Args:
             value: New formal title prefix
@@ -341,9 +332,8 @@ class Config:
         """
         self._config["formal_title"] = value
 
-    def as_dict(self) -> Dict[str, Any]:
-        """
-        Get configuration as dictionary.
+    def as_dict(self) -> dict[str, Any]:
+        """Get configuration as dictionary.
 
         Returns:
             A copy of the current configuration dictionary

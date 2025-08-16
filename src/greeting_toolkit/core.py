@@ -1,18 +1,17 @@
-"""Core functionality of my_python_package."""
+"""Core functionality of greeting_toolkit."""
 
 from __future__ import annotations
 
-import random
 import re
+import secrets
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from .config import config
 
 
-def hello(name: str, greeting: Optional[str] = None) -> str:
-    """
-    Return a personalized greeting message.
+def hello(name: str, greeting: str | None = None) -> str:
+    """Return a personalized greeting message.
 
     Args:
         name: The name to greet
@@ -59,8 +58,7 @@ def hello(name: str, greeting: Optional[str] = None) -> str:
 
 
 def generate_greeting(name: str, formal: bool = False, time_based: bool = False) -> str:
-    """
-    Generate a context-aware greeting.
+    """Generate a context-aware greeting.
 
     Args:
         name: The name to greet
@@ -106,9 +104,8 @@ def generate_greeting(name: str, formal: bool = False, time_based: bool = False)
     return f"{greeting}, {title}{name}!"
 
 
-def validate_name(name: str) -> Tuple[bool, Optional[str]]:
-    """
-    Validate a name according to basic rules.
+def validate_name(name: str) -> tuple[bool, str | None]:
+    """Validate a name according to basic rules.
 
     Rules:
     - Must not be empty
@@ -174,9 +171,8 @@ def validate_name(name: str) -> Tuple[bool, Optional[str]]:
     return True, None
 
 
-def create_greeting_list(names: List[str], greeting: Optional[str] = None) -> List[str]:
-    """
-    Create a list of greetings for multiple names.
+def create_greeting_list(names: list[str], greeting: str | None = None) -> list[str]:
+    """Create a list of greetings for multiple names.
 
     Args:
         names: List of names to greet
@@ -211,8 +207,10 @@ def create_greeting_list(names: List[str], greeting: Optional[str] = None) -> Li
 
 
 def random_greeting(name: str) -> str:
-    """
-    Generate a random greeting from a predefined list.
+    """Generate a random greeting from a predefined list.
+
+    Uses :mod:`secrets` for unpredictability; while this is unnecessary for
+    most greetings, it avoids the weaker :mod:`random` module.
 
     Args:
         name: The name to greet
@@ -221,39 +219,29 @@ def random_greeting(name: str) -> str:
         A random greeting message
 
     Examples:
-        >>> # Control randomness with seed
-        >>> import random
-        >>> random.seed(42)  # Set seed for reproducible example
-        >>> # The exact greeting depends on config.available_greetings
         >>> greeting = random_greeting("Python")
-        >>> "Python" in greeting  # Name should be in the greeting
+        >>> "Python" in greeting
         True
         >>> any(g in greeting for g in config.available_greetings)
         True
 
-        >>> # Verify different calls give different results
-        >>> # Reset the seed
-        >>> random.seed(None)
-        >>> # Get multiple greetings
         >>> greetings = [random_greeting("Test") for _ in range(10)]
-        >>> # Count unique greetings - should be more than 1 if truly random
         >>> len(set(greetings)) > 1
         True
     """
     greetings = config.available_greetings
-    return f"{random.choice(greetings)}, {name}!"
+    return f"{secrets.choice(greetings)}, {name}!"
 
 
 def format_greeting(
     name: str,
     *,
-    greeting: Optional[str] = None,
-    punctuation: Optional[str] = None,
+    greeting: str | None = None,
+    punctuation: str | None = None,
     uppercase: bool = False,
-    max_length: Optional[int] = None,
+    max_length: int | None = None,
 ) -> str:
-    """
-    Format a greeting with various options.
+    """Format a greeting with various options.
 
     Args:
         name: The name to greet
@@ -311,7 +299,7 @@ def format_greeting(
             # Truncate to max_length-3, then add "..."
             # For "Hello, John!" with max_length=10:
             # Take "Hello, J" (8 chars) + "..." = "Hello, J..."
-            truncated_base = result[:max_length - 3]
+            truncated_base = result[: max_length - 3]
             result = truncated_base + "..."
 
     # Apply uppercase after truncation
@@ -322,8 +310,7 @@ def format_greeting(
 
 
 def set_default_greeting(greeting: str) -> None:
-    """
-    Set the default greeting in the configuration.
+    """Set the default greeting in the configuration.
 
     Args:
         greeting: New default greeting
@@ -402,7 +389,7 @@ def add_greeting(greeting: str) -> None:
         config.available_greetings = greetings
 
 
-def get_config() -> Dict[str, Any]:
+def get_config() -> dict[str, Any]:
     """Get the current configuration.
 
     Returns:
@@ -427,4 +414,3 @@ def get_config() -> Dict[str, Any]:
         True
     """
     return config.as_dict()
-

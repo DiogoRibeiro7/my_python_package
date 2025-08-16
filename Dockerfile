@@ -40,4 +40,4 @@ RUN poetry install
 ENTRYPOINT ["poetry", "run"]
 
 # Default command
-CMD ["python", "-m", "my_python_package"]
+CMD ["python", "-m", "greeting_toolkit"]

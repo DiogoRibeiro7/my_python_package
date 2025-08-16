@@ -1,5 +1,4 @@
-"""
-my_python_package - A minimal but production-ready Python package.
+"""greeting_toolkit - A minimal but production-ready Python package.
 
 This package demonstrates a properly structured Python project
 with modern tooling and configuration.
@@ -8,18 +7,18 @@ The package provides various greeting functions with configurable
 options for formatting, randomization, and validation.
 
 Examples:
-    >>> from my_python_package import hello
+    >>> from greeting_toolkit import hello
     >>> hello("World")
     'Hello, World!'
 
-    >>> from my_python_package import generate_greeting
+    >>> from greeting_toolkit import generate_greeting
     >>> import re
     >>> # Time-based greeting will vary by time of day
     >>> bool(re.match(r'(Good (morning|afternoon|evening)|Hello), World!',
     ...               generate_greeting("World", time_based=True)))
     True
 
-    >>> from my_python_package import random_greeting
+    >>> from greeting_toolkit import random_greeting
     >>> # Random greeting will contain the name
     >>> "World" in random_greeting("World")
     True
@@ -36,7 +35,7 @@ from .core import (
 )
 
 # Version and author information
-__version__: str = "0.2.0"
+__version__: str = "0.3.0"
 __author__: str = "Diogo Ribeiro"
 
 # Public API
@@ -49,16 +48,18 @@ __all__ = [
     "format_greeting",
 ]
 
-# Enable CLI usage with python -m my_python_package
+
+# Enable CLI usage with python -m greeting_toolkit
 def _main() -> None:
-    """
-    Entry point for module execution.
+    """Entry point for module execution.
 
     This function is called when the module is run directly
-    with `python -m my_python_package`.
+    with `python -m greeting_toolkit`.
     """
-    from .cli import main
     import sys
+
+    from .cli import main
+
     sys.exit(main())
 
 

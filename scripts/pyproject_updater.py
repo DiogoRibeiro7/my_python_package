@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""
-pyproject_updater.py
+"""pyproject_updater.py
 
 Update dependency constraints in `pyproject.toml` to the **latest** versions from PyPI.
 
@@ -37,29 +36,32 @@ import json
 import sys
 import urllib.error
 import urllib.request
+from collections.abc import Iterable
 from dataclasses import dataclass
 from difflib import unified_diff
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
+from urllib.parse import urlparse
 
 import tomlkit
 from packaging.requirements import Requirement
-from packaging.version import Version, InvalidVersion
+from packaging.version import InvalidVersion, Version
 
 
 @dataclass(frozen=True)
 class Options:
-    strategy: str               # one of: exact, caret, tilde, floor
-    allow_major: bool           # if False, keep within current major
-    include_prerelease: bool    # if True, accept pre-releases
-    groups: List[str]           # e.g., ["main", "dev"]
-    only: Optional[List[str]]   # package name filters (normalized)
-    check: bool                 # dry-run
-    file: Path                  # pyproject.toml path
-    timeout: float              # HTTP timeout
+    strategy: str  # one of: exact, caret, tilde, floor
+    allow_major: bool  # if False, keep within current major
+    include_prerelease: bool  # if True, accept pre-releases
+    groups: list[str]  # e.g., ["main", "dev"]
+    only: list[str] | None  # package name filters (normalized)
+    check: bool  # dry-run
+    file: Path  # pyproject.toml path
+    timeout: float  # HTTP timeout
 
 
 # ---------- TOML helpers ----------
+
 
 def _read_doc(path: Path):
     text = path.read_text(encoding="utf-8")
@@ -68,8 +70,14 @@ def _read_doc(path: Path):
 
 def _write_or_diff(path: Path, before: str, after: str, check: bool) -> int:
     if check:
-        diff = "".join(unified_diff(before.splitlines(True), after.splitlines(True),
-                                    fromfile=str(path), tofile=str(path)))
+        diff = "".join(
+            unified_diff(
+                before.splitlines(True),
+                after.splitlines(True),
+                fromfile=str(path),
+                tofile=str(path),
+            )
+        )
         sys.stdout.write(diff)
         return 0
     path.write_text(after, encoding="utf-8")
@@ -87,28 +95,28 @@ def _layout(doc) -> str:
 
 # ---------- PyPI version lookup ----------
 
+
 def _normalize_pkg_name(name: str) -> str:
-    """
-    Normalize per PEP 503 for PyPI URLs: lowercase and replace `_`/`.` with `-`.
+    """Normalize per PEP 503 for PyPI URLs: lowercase and replace `_`/`.` with `-`.
     Keep extras separate (e.g., 'foo[bar]') — we strip extras for lookup.
     """
     base = name.split("[", 1)[0]
     return base.lower().replace("_", "-").replace(".", "-")
 
 
-def _fetch_pypi_versions(name: str, timeout: float) -> Dict[str, bool]:
-    """
-    Return {version_str: is_yanked=False/True} for package 'name' from PyPI.
-    On failure, return empty dict.
-    """
+def _fetch_pypi_versions(name: str, timeout: float) -> dict[str, bool]:
+    """Return ``{version_str: is_yanked}`` for package *name* from PyPI."""
     url = f"https://pypi.org/pypi/{_normalize_pkg_name(name)}/json"
     try:
+        parsed = urlparse(url)
+        if parsed.scheme not in {"http", "https"}:
+            raise ValueError(f"Unsupported URL scheme: {parsed.scheme}")
         with urllib.request.urlopen(url, timeout=timeout) as resp:
             data = json.loads(resp.read().decode("utf-8"))
     except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
         return {}
 
-    versions: Dict[str, bool] = {}
+    versions: dict[str, bool] = {}
     releases = data.get("releases", {}) or {}
     for ver_str, files in releases.items():
         # files is a list of distributions; consider version yanked if all files are yanked
@@ -119,11 +127,9 @@ def _fetch_pypi_versions(name: str, timeout: float) -> Dict[str, bool]:
     return versions
 
 
-def _select_latest_version(versions: Dict[str, bool], include_prerelease: bool) -> Optional[Version]:
-    """
-    Pick the highest non-yanked Version. If include_prerelease=False, prefer finals.
-    """
-    valid: List[Version] = []
+def _select_latest_version(versions: dict[str, bool], include_prerelease: bool) -> Version | None:
+    """Pick the highest non-yanked Version. If include_prerelease=False, prefer finals."""
+    valid: list[Version] = []
     for ver_str, not_yanked in versions.items():
         if not not_yanked:
             continue
@@ -140,6 +146,7 @@ def _select_latest_version(versions: Dict[str, bool], include_prerelease: bool) 
 
 
 # ---------- Constraint mapping ----------
+
 
 def _poetry_string_for_strategy(v: Version, strategy: str) -> str:
     if strategy == "exact":
@@ -169,9 +176,8 @@ def _pep440_string_for_strategy(v: Version, strategy: str) -> str:
     raise ValueError(f"Unknown strategy: {strategy}")
 
 
-def _respect_major_allowed(current_spec: Optional[str], latest: Version, allow_major: bool) -> bool:
-    """
-    If allow_major is False and current_spec indicates a major cap, avoid bumping across majors.
+def _respect_major_allowed(current_spec: str | None, latest: Version, allow_major: bool) -> bool:
+    """If allow_major is False and current_spec indicates a major cap, avoid bumping across majors.
     Heuristic: extract existing max major from spec if present; otherwise compare against any pinned/ranged major.
     """
     if allow_major:
@@ -180,7 +186,11 @@ def _respect_major_allowed(current_spec: Optional[str], latest: Version, allow_m
         return latest.major == latest.major  # trivial True
     # Try to parse the requirement to see any existing max
     try:
-        req = Requirement(f"pkg {current_spec}") if " " in current_spec else Requirement(f"pkg {current_spec}")
+        req = (
+            Requirement(f"pkg {current_spec}")
+            if " " in current_spec
+            else Requirement(f"pkg {current_spec}")
+        )
     except Exception:
         # Fallback: if spec starts with ^ or ~ (Poetry), infer major from latest string of spec if present
         if current_spec.startswith("^") or current_spec.startswith("~"):
@@ -206,13 +216,14 @@ def _respect_major_allowed(current_spec: Optional[str], latest: Version, allow_m
 
 # ---------- Dependency iteration & rewriting ----------
 
+
 @dataclass
 class DepRef:
-    layout: str                 # "poetry" or "pep621"
-    group: str                  # "main" or group name
-    name: str                   # raw name as in file (may include extras)
-    current_spec: Optional[str] # string spec; None if path/git or table
-    location: Tuple             # references for writing (table/array and key/index)
+    layout: str  # "poetry" or "pep621"
+    group: str  # "main" or group name
+    name: str  # raw name as in file (may include extras)
+    current_spec: str | None  # string spec; None if path/git or table
+    location: tuple  # references for writing (table/array and key/index)
 
 
 def _iter_poetry_deps(doc, groups: Iterable[str]) -> Iterable[DepRef]:
@@ -281,8 +292,7 @@ def _iter_pep621_deps(doc, groups: Iterable[str]) -> Iterable[DepRef]:
     if not groups_set or "main" in groups_set:
         arr = project.setdefault("dependencies", tomlkit.array())
         emit = list(emit_from_array(arr, "main"))
-        for d in emit:
-            yield d
+        yield from emit
 
     # optional groups
     opt = project.setdefault("optional-dependencies", tomlkit.table())
@@ -291,14 +301,11 @@ def _iter_pep621_deps(doc, groups: Iterable[str]) -> Iterable[DepRef]:
             if groups_set and gname not in groups_set:
                 continue
             emit = list(emit_from_array(arr, gname))
-            for d in emit:
-                yield d
+            yield from emit
 
 
 def _set_dep_spec(dep: DepRef, new_spec: str):
-    """
-    Write back new spec to the TOML document at the stored location.
-    """
+    """Write back new spec to the TOML document at the stored location."""
     if dep.layout == "poetry":
         tbl, key = dep.location  # type: ignore[assignment]
         if isinstance(tbl, dict):
@@ -321,13 +328,14 @@ def _set_dep_spec(dep: DepRef, new_spec: str):
 
 # ---------- Main upgrade routine ----------
 
+
 def upgrade(pyproject: Path, opts: Options) -> int:
     before_text, doc = _read_doc(pyproject)
     layout = _layout(doc)
 
     # Which groups to consider by default
     groups = opts.groups or ["main", "dev"]  # include Poetry dev by default
-    only_norm = set(_normalize_pkg_name(n) for n in (opts.only or []))
+    only_norm = {_normalize_pkg_name(n) for n in (opts.only or [])}
 
     # Iterate deps
     iterator = _iter_poetry_deps if layout == "poetry" else _iter_pep621_deps
@@ -360,7 +368,13 @@ def upgrade(pyproject: Path, opts: Options) -> int:
             if target_major is not None:
                 # pick highest < target_major+1.0.0
                 candidates = [Version(v) for v, ok in versions.items() if ok]
-                within = [v for v in candidates if (v.major == target_major and (opts.include_prerelease or not v.is_prerelease))]
+                within = [
+                    v
+                    for v in candidates
+                    if (
+                        v.major == target_major and (opts.include_prerelease or not v.is_prerelease)
+                    )
+                ]
                 if within:
                     latest = max(within)
 
@@ -384,22 +398,51 @@ def upgrade(pyproject: Path, opts: Options) -> int:
     return _write_or_diff(pyproject, before_text, after_text, opts.check)
 
 
-def parse_args(argv: Optional[List[str]] = None) -> Options:
-    p = argparse.ArgumentParser(description="Upgrade pyproject dependency constraints to latest from PyPI.")
+def parse_args(argv: list[str] | None = None) -> Options:
+    p = argparse.ArgumentParser(
+        description="Upgrade pyproject dependency constraints to latest from PyPI."
+    )
     p.add_argument("--file", default="pyproject.toml", help="Path to pyproject.toml")
-    p.add_argument("--strategy", choices=["exact", "caret", "tilde", "floor"], default="caret",
-                   help="How to express the updated constraint.")
-    p.add_argument("--allow-major", action="store_true", help="Allow bumping to a new MAJOR version.")
-    p.add_argument("--respect-major", dest="allow_major", action="store_false",
-                   help="(default) Keep within the current major if possible.")
+    p.add_argument(
+        "--strategy",
+        choices=["exact", "caret", "tilde", "floor"],
+        default="caret",
+        help="How to express the updated constraint.",
+    )
+    p.add_argument(
+        "--allow-major", action="store_true", help="Allow bumping to a new MAJOR version."
+    )
+    p.add_argument(
+        "--respect-major",
+        dest="allow_major",
+        action="store_false",
+        help="(default) Keep within the current major if possible.",
+    )
     p.set_defaults(allow_major=False)
-    p.add_argument("--pre", "--include-prerelease", dest="include_prerelease", action="store_true",
-                   help="Allow pre-releases when picking the latest.")
-    p.add_argument("--no-prerelease", dest="include_prerelease", action="store_false",
-                   help="(default) Exclude pre-releases.")
+    p.add_argument(
+        "--pre",
+        "--include-prerelease",
+        dest="include_prerelease",
+        action="store_true",
+        help="Allow pre-releases when picking the latest.",
+    )
+    p.add_argument(
+        "--no-prerelease",
+        dest="include_prerelease",
+        action="store_false",
+        help="(default) Exclude pre-releases.",
+    )
     p.set_defaults(include_prerelease=False)
-    p.add_argument("--groups", default="main,dev", help="Comma-separated groups: e.g., main,dev or analytics,docs")
-    p.add_argument("--only", default="", help="Comma-separated package names to update (normalized). Empty=all.")
+    p.add_argument(
+        "--groups",
+        default="main,dev",
+        help="Comma-separated groups: e.g., main,dev or analytics,docs",
+    )
+    p.add_argument(
+        "--only",
+        default="",
+        help="Comma-separated package names to update (normalized). Empty=all.",
+    )
     p.add_argument("--check", action="store_true", help="Dry-run: show unified diff, do not write.")
     p.add_argument("--timeout", type=float, default=8.0, help="HTTP timeout (seconds).")
 
@@ -419,7 +462,7 @@ def parse_args(argv: Optional[List[str]] = None) -> Options:
     )
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     opts = parse_args(argv)
     return upgrade(opts.file, opts)
 

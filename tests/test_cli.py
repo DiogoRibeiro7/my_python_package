@@ -1,12 +1,24 @@
 """Tests for the CLI module."""
 
-import sys
+from copy import deepcopy
 from io import StringIO
 from unittest.mock import patch
 
 import pytest
 
-from my_python_package.cli import main, parse_args
+from greeting_toolkit.cli import main, parse_args
+from greeting_toolkit.config import DEFAULT_CONFIG
+from greeting_toolkit.config import config as global_config
+
+ORIGINAL_DEFAULTS = deepcopy(DEFAULT_CONFIG)
+
+
+@pytest.fixture(autouse=True)
+def reset_config() -> None:
+    yield
+    DEFAULT_CONFIG.clear()
+    DEFAULT_CONFIG.update(deepcopy(ORIGINAL_DEFAULTS))
+    global_config._config = deepcopy(ORIGINAL_DEFAULTS)
 
 
 def test_parse_args_hello():
@@ -52,13 +64,19 @@ def test_parse_args_format():
     assert not args.uppercase
     assert args.max_length is None
 
-    args = parse_args([
-        "format", "World",
-        "--greeting", "Hi",
-        "--punctuation", ".",
-        "--uppercase",
-        "--max-length", "10",
-    ])
+    args = parse_args(
+        [
+            "format",
+            "World",
+            "--greeting",
+            "Hi",
+            "--punctuation",
+            ".",
+            "--uppercase",
+            "--max-length",
+            "10",
+        ]
+    )
     assert args.command == "format"
     assert args.name == "World"
     assert args.greeting == "Hi"
@@ -89,7 +107,7 @@ def test_main_no_command():
 
 
 @pytest.mark.parametrize(
-    "command,args,expected_output",
+    ("command", "args", "expected_output"),
     [
         (
             "hello",
@@ -106,11 +124,11 @@ def test_main_no_command():
             ["World", "--uppercase"],
             "HELLO, WORLD!",
         ),
-         (
-             "format",
-             ["World", "--max-length", "10"],
-             "Hello, ...",
-         ),
+        (
+            "format",
+            ["World", "--max-length", "10"],
+            "Hello, ...",
+        ),
         (
             "multi",
             ["Alice", "Bob"],
@@ -127,7 +145,7 @@ def test_main_commands(command, args, expected_output):
 
 
 @pytest.mark.parametrize(
-    "command,args,expected_in_output",
+    ("command", "args", "expected_in_output"),
     [
         (
             "random",
@@ -147,3 +165,58 @@ def test_main_variable_output_commands(command, args, expected_in_output):
         result = main([command] + args)
         assert result == 0
         assert expected_in_output in fake_out.getvalue()
+
+
+def test_main_config_show():
+    """Test showing configuration via CLI."""
+    with patch("sys.stdout", new=StringIO()) as fake_out:
+        result = main(["config", "show"])
+        assert result == 0
+        assert "default_greeting" in fake_out.getvalue()
+
+
+def test_main_config_set():
+    """Test setting configuration values via CLI."""
+    with patch("sys.stdout", new=StringIO()) as fake_out:
+        result = main(
+            [
+                "config",
+                "set",
+                "--greeting",
+                "Hi",
+                "--punctuation",
+                ".",
+                "--title",
+                "Dr. ",
+                "--max-name-length",
+                "10",
+            ]
+        )
+        output = fake_out.getvalue()
+        assert result == 0
+        assert "Default greeting set to: Hi" in output
+        assert "Default punctuation set to: ." in output
+        assert "Formal title set to: Dr. " in output
+        assert "Max name length set to: 10" in output
+
+
+def test_main_config_add_greeting():
+    """Test adding a greeting via CLI."""
+    with patch("sys.stdout", new=StringIO()) as fake_out:
+        result = main(["config", "add-greeting", "Ahoy"])
+        output = fake_out.getvalue()
+        assert result == 0
+        assert "Added greeting: Ahoy" in output
+
+
+def test_main_config_save_and_load(tmp_path):
+    """Test saving and loading configuration via CLI."""
+    config_file = tmp_path / "config.json"
+    with patch("sys.stdout", new=StringIO()) as fake_out:
+        result = main(["config", "save", str(config_file)])
+        assert result == 0
+        assert config_file.exists()
+    with patch("sys.stdout", new=StringIO()) as fake_out:
+        result = main(["config", "load", str(config_file)])
+        assert result == 0
+        assert "Configuration loaded from" in fake_out.getvalue()

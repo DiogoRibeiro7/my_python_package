@@ -161,7 +161,7 @@ def create_index_file(
     structure: Dict[str, List[str]],
     output_dir: Path,
     format_type: Literal["html", "markdown"] = "markdown",
-    package_name: str = "my_python_package"
+    package_name: str = "greeting_toolkit"
 ) -> None:
     """
     Create an index file that links to all the module documentation.
@@ -268,7 +268,7 @@ def create_index_file(
 def generate_docs(
     format_type: Literal["html", "markdown"] = "html",
     output_dir: Optional[Path] = None,
-    package_name: str = "my_python_package",
+    package_name: str = "greeting_toolkit",
 ) -> bool:
     """
     Generate documentation using pdoc.
@@ -351,8 +351,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--package",
-        default="my_python_package",
-        help="Package name to document (default: my_python_package)",
+        default="greeting_toolkit",
+        help="Package name to document (default: greeting_toolkit)",
     )
     return parser.parse_args()
 

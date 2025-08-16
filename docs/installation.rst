@@ -5,11 +5,11 @@ Installation
 From PyPI
 ---------
 
-The package is available on `PyPI <https://pypi.org/project/my-python-package/>`_, and you can install it using pip:
+The package is available on `PyPI <https://pypi.org/project/greeting-toolkit/>`_, and you can install it using pip:
 
 .. code-block:: bash
 
-    pip install my_python_package
+    pip install greeting-toolkit
 
 Using Poetry
 -----------
@@ -18,7 +18,7 @@ If you use `Poetry <https://python-poetry.org/>`_ for dependency management, you
 
 .. code-block:: bash
 
-    poetry add my_python_package
+    poetry add greeting-toolkit
 
 From Source
 ----------
@@ -27,8 +27,8 @@ To install the package from source, first clone the repository:
 
 .. code-block:: bash
 
-    git clone https://github.com/DiogoRibeiro7/my_python_package.git
-    cd my_python_package
+    git clone https://github.com/DiogoRibeiro7/greeting-toolkit.git
+    cd greeting-toolkit
 
 Then install it using one of the following methods:
 
@@ -71,7 +71,7 @@ To verify that the package is installed correctly, you can run the following Pyt
 
 .. code-block:: python
 
-    from my_python_package import hello
+    from greeting_toolkit import hello
 
     print(hello("World"))  # Should output: Hello, World!
 
@@ -79,6 +79,6 @@ Or use the command-line interface:
 
 .. code-block:: bash
 
-    my-python-package hello World
+    greeting-toolkit hello World
 
 This should output: ``Hello, World!``

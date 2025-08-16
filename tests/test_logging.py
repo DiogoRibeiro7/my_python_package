@@ -3,15 +3,13 @@
 import io
 import logging
 import os
-import sys
-import tempfile
+import shutil
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-from my_python_package.logging import (
-    DEFAULT_FORMAT,
+from greeting_toolkit.logging import (
     configure_logging,
     get_logger,
     logger,
@@ -39,7 +37,7 @@ def reset_logger():
 def test_default_logger_configuration():
     """Test the default logger configuration."""
     # Verify the logger exists and has the correct name
-    assert logger.name == "my_python_package"
+    assert logger.name == "greeting_toolkit"
 
     # Verify at least one handler is configured (console output)
     assert len(logger.handlers) > 0
@@ -88,9 +86,7 @@ def test_configure_logging_propagate(reset_logger):
 
 def test_configure_logging_file(reset_logger):
     """Test configuring logging to a file."""
-    # Create a temporary file for logging
-    with tempfile.NamedTemporaryFile(delete=False) as tmp:
-        tmp_path = tmp.name
+    tmp_path = Path("test.log")
 
     try:
         # Configure with file
@@ -102,32 +98,27 @@ def test_configure_logging_file(reset_logger):
 
         # Verify the file handler has the correct path
         for handler in file_handlers:
-            assert handler.baseFilename == tmp_path
+            assert Path(handler.baseFilename) == tmp_path.resolve()
 
         # Write a log message
         test_message = "Test log message to file"
         logger.info(test_message)
 
         # Verify the message was written to the file
-        with open(tmp_path, "r") as f:
-            content = f.read()
-            assert test_message in content
+        content = tmp_path.read_text()
+        assert test_message in content
 
     finally:
-        # Clean up
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+        if tmp_path.exists():
+            tmp_path.unlink()
 
 
 def test_configure_logging_file_directory_creation(reset_logger):
     """Test logging to a file in a non-existent directory."""
-    # Create a temporary directory
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        # Create a path to a subdirectory that doesn't exist
-        log_dir = Path(tmp_dir) / "logs"
-        log_file = log_dir / "test.log"
+    log_dir = Path("logs") / "subdir"
+    log_file = log_dir / "test.log"
 
-        # Configure logging to this file
+    try:
         configure_logging(log_file=log_file)
 
         # Verify the directory was created
@@ -141,6 +132,9 @@ def test_configure_logging_file_directory_creation(reset_logger):
         assert log_file.exists()
         content = log_file.read_text()
         assert test_message in content
+    finally:
+        if log_dir.parent.exists():
+            shutil.rmtree(log_dir.parent)
 
 
 def test_get_logger():
@@ -150,7 +144,7 @@ def test_get_logger():
     module_logger = get_logger(module_name)
 
     # Verify the logger has the correct name
-    assert module_logger.name == f"my_python_package.{module_name}"
+    assert module_logger.name == f"greeting_toolkit.{module_name}"
 
     # Verify it's a proper logger instance
     assert isinstance(module_logger, logging.Logger)
@@ -183,34 +177,36 @@ def test_environment_variable_configuration():
     original_env = os.environ.copy()
 
     try:
-        # Create a temporary file for logging
-        with tempfile.NamedTemporaryFile(delete=False) as tmp:
-            tmp_path = tmp.name
+        tmp_path = Path("env.log")
 
-        # Directly call the function we want to test
-        from my_python_package.logging import _configure_from_env
+        from greeting_toolkit.logging import _configure_from_env
 
-        # Set environment variables
-        os.environ["MY_PYTHON_PACKAGE_LOG_LEVEL"] = "DEBUG"
-        os.environ["MY_PYTHON_PACKAGE_LOG_FILE"] = tmp_path
+        os.environ["GREETING_TOOLKIT_LOG_LEVEL"] = "DEBUG"
+        os.environ["GREETING_TOOLKIT_LOG_FILE"] = str(tmp_path)
 
-        # Call the function with patching
-        with patch("my_python_package.logging.configure_logging") as mock_configure:
+        with patch("greeting_toolkit.logging.configure_logging") as mock_configure:
             _configure_from_env()
 
-            # Verify the function was called with the right parameters
             mock_configure.assert_called_once()
             args, kwargs = mock_configure.call_args
             assert kwargs.get("level") == "DEBUG"
-            assert kwargs.get("log_file") == tmp_path
+            assert Path(kwargs.get("log_file")) == tmp_path
 
     finally:
-        # Clean up
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
-        # Restore original environment
+        if tmp_path.exists():
+            tmp_path.unlink()
         os.environ.clear()
         os.environ.update(original_env)
+
+
+def test_configure_logging_rejects_external_path(reset_logger):
+    """Logging to paths outside CWD should be ignored."""
+    outside = Path("/etc/passwd")
+    with patch.object(logger, "warning") as warn:
+        configure_logging(log_file=outside)
+        warn.assert_called()
+
+    assert not any(isinstance(h, logging.FileHandler) for h in logger.handlers)
 
 
 def test_logging_levels(reset_logger):
@@ -277,4 +273,4 @@ def test_nested_logger():
     nested_logger = get_logger("module.submodule")
 
     # Verify the logger has the correct name
-    assert nested_logger.name == "my_python_package.module.submodule"
+    assert nested_logger.name == "greeting_toolkit.module.submodule"

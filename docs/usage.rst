@@ -2,7 +2,7 @@
 Usage
 =====
 
-This page demonstrates how to use the various features of ``my_python_package``.
+This page demonstrates how to use the various features of ``greeting_toolkit``.
 
 Basic Greeting
 -------------
@@ -11,7 +11,7 @@ The most basic function is ``hello()``, which returns a simple greeting:
 
 .. code-block:: python
 
-    from my_python_package import hello
+    from greeting_toolkit import hello
 
     # Basic usage
     greeting = hello("World")
@@ -28,7 +28,7 @@ For more control over the output, use ``format_greeting()``:
 
 .. code-block:: python
 
-    from my_python_package import format_greeting
+    from greeting_toolkit import format_greeting
 
     # Default formatting
     print(format_greeting("World"))  # Output: Hello, World!
@@ -51,7 +51,7 @@ To greet multiple people at once, use ``create_greeting_list()``:
 
 .. code-block:: python
 
-    from my_python_package import create_greeting_list
+    from greeting_toolkit import create_greeting_list
 
     # Greet multiple people
     greetings = create_greeting_list(["Alice", "Bob", "Charlie"])
@@ -70,7 +70,7 @@ The ``generate_greeting()`` function can adjust the greeting based on the time o
 
 .. code-block:: python
 
-    from my_python_package import generate_greeting
+    from greeting_toolkit import generate_greeting
 
     # Time-based greeting (morning/afternoon/evening)
     print(generate_greeting("World", time_based=True))
@@ -94,7 +94,7 @@ For variety, use ``random_greeting()`` to get a different greeting each time:
 
 .. code-block:: python
 
-    from my_python_package import random_greeting
+    from greeting_toolkit import random_greeting
 
     # Get a random greeting
     print(random_greeting("World"))  # Different greeting each time
@@ -106,7 +106,7 @@ To validate names before using them in greetings, use ``validate_name()``:
 
 .. code-block:: python
 
-    from my_python_package import validate_name
+    from greeting_toolkit import validate_name
 
     # Check if a name is valid
     valid, error = validate_name("John")
@@ -127,8 +127,8 @@ You can configure default settings for the package:
 
 .. code-block:: python
 
-    from my_python_package.core import set_default_greeting, set_default_punctuation, add_greeting
-    from my_python_package.config import config
+    from greeting_toolkit.core import set_default_greeting, set_default_punctuation, add_greeting
+    from greeting_toolkit.config import config
 
     # Set default greeting
     set_default_greeting("Howdy")
@@ -159,7 +159,7 @@ You can combine multiple features for more complex behavior:
 
 .. code-block:: python
 
-    from my_python_package import validate_name, format_greeting, hello
+    from greeting_toolkit import validate_name, format_greeting, hello
 
     def greet_user(name, formal=False, uppercase=False):
         # First validate the name
@@ -191,7 +191,7 @@ For more advanced use cases, you can create a custom greeting system:
 
 .. code-block:: python
 
-    from my_python_package import format_greeting, random_greeting, generate_greeting
+    from greeting_toolkit import format_greeting, random_greeting, generate_greeting
     import random
 
     class GreetingSystem:
